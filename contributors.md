@@ -14,4 +14,4 @@ Contributors:
 
     Siyabonga P Khumalo    - System's Engineer
     Isaac Madyauta.        - Database administrator 
-    Lisa Tshenamo _   systems  Engiener
+    Lisa Tshenamo _   systems  Engineer 
