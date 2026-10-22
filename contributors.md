@@ -2,8 +2,8 @@ Egrocca is an innovative droid designed to make shopping simple and accessible f
 
 Contributors:
 
-    [Contributor Name 1] – [Role/Contribution, e.g., Lead Engineer]
+    [Contribut – [Role/Contribution, e.g., Project Manager]
 
     [Contributor Name 2] – [Role/Contribution, e.g., Software Developer]
 
-    [Contributor Name 3] – [Role/Contribution, e.g., Hardware Designer]
+    Mphathisi Ndlovu     -  Programmer    
