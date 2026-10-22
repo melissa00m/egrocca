@@ -3,9 +3,13 @@ Egrocca is an innovative droid designed to make shopping simple and accessible f
 Contributors:
 
     Reuben T Mugwamba – Project Manager
+    
     [Contributor Name 2] – [Role/Contribution, e.g., Software Developer]
 
     Mphathisi Ndlovu     -  Programmer    
 
     Melissa S Dube        - Software engineer
-Prince Mubayi             -Chief security officer
+    
+    Prince Mubayi             -Chief security officer
+
+    Siyabonga P Khumalo    - System's Engineer
