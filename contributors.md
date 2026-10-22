@@ -4,7 +4,7 @@ Contributors:
 
     Reuben T Mugwamba – Project Manager
     
-    [Contributor Name 2] – [Role/Contribution, e.g., Software Developer]
+    [Hopewell Z Ndlovu] – Test Programmer
 
     Mphathisi Ndlovu     -  Programmer    
 
