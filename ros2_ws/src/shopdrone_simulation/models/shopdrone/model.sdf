@@ -1,0 +1,537 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <model name="shopdrone">
+    <static>false</static>
+    <pose>0 0 0.18 0 0 0</pose>
+
+    <!-- ==================================================== -->
+    <!-- MAIN DRONE CHASSIS & AIRFRAME                        -->
+    <!-- ==================================================== -->
+    <link name="base_link">
+      <inertial>
+        <mass>3.2</mass>
+        <inertia>
+          <ixx>0.065</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.065</iyy>
+          <iyz>0</iyz>
+          <izz>0.095</izz>
+        </inertia>
+      </inertial>
+
+      <!-- Central Aerodynamic Carbon Fuselage -->
+      <visual name="fuselage_main">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box><size>0.36 0.28 0.09</size></box>
+        </geometry>
+        <material>
+          <ambient>0.2 0.2 0.22 1</ambient>
+          <diffuse>0.3 0.3 0.35 1</diffuse>
+          <specular>0.8 0.8 0.85 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/carbon_fiber.png</albedo_map>
+              <roughness>0.35</roughness>
+              <metalness>0.6</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+      <collision name="chassis_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box><size>0.36 0.28 0.12</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Aerodynamic Top Canopy Shell -->
+      <visual name="canopy_top">
+        <pose>0.02 0 0.055 0 0 0</pose>
+        <geometry>
+          <ellipsoid><radii>0.16 0.11 0.04</radii></ellipsoid>
+        </geometry>
+        <material>
+          <ambient>0.9 0.45 0.05 1</ambient>
+          <diffuse>0.95 0.5 0.1 1</diffuse>
+          <specular>0.9 0.9 0.9 1</specular>
+        </material>
+      </visual>
+
+      <!-- High-Precision RTK GPS Antenna Dome (Saucer) -->
+      <visual name="rtk_gps_mast">
+        <pose>-0.08 0 0.09 0 0 0</pose>
+        <geometry>
+          <cylinder><radius>0.006</radius><length>0.06</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.2 0.2 0.2 1</diffuse>
+        </material>
+      </visual>
+      <visual name="rtk_gps_dome">
+        <pose>-0.08 0 0.125 0 0 0</pose>
+        <geometry>
+          <cylinder><radius>0.04</radius><length>0.015</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.9 0.9 0.9 1</ambient>
+          <diffuse>0.95 0.95 0.95 1</diffuse>
+          <specular>0.6 0.6 0.6 1</specular>
+        </material>
+      </visual>
+
+      <!-- ==================================================== -->
+      <!-- CARBON FIBER BOOMS & ARMS (Diagonal X-Configuration)  -->
+      <!-- ==================================================== -->
+      <!-- Front-Right Arm -->
+      <visual name="arm_fr">
+        <pose>0.16 0.16 0 0 0 0.7854</pose>
+        <geometry>
+          <cylinder><radius>0.012</radius><length>0.28</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.15 0.15 0.15 1</ambient>
+          <diffuse>0.2 0.2 0.2 1</diffuse>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/carbon_fiber.png</albedo_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+      <!-- Front-Left Arm -->
+      <visual name="arm_fl">
+        <pose>0.16 -0.16 0 0 0 -0.7854</pose>
+        <geometry>
+          <cylinder><radius>0.012</radius><length>0.28</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.15 0.15 0.15 1</ambient>
+          <diffuse>0.2 0.2 0.2 1</diffuse>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/carbon_fiber.png</albedo_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+      <!-- Rear-Right Arm -->
+      <visual name="arm_rr">
+        <pose>-0.16 0.16 0 0 0 -0.7854</pose>
+        <geometry>
+          <cylinder><radius>0.012</radius><length>0.28</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.15 0.15 0.15 1</ambient>
+          <diffuse>0.2 0.2 0.2 1</diffuse>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/carbon_fiber.png</albedo_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+      <!-- Rear-Left Arm -->
+      <visual name="arm_rl">
+        <pose>-0.16 -0.16 0 0 0 0.7854</pose>
+        <geometry>
+          <cylinder><radius>0.012</radius><length>0.28</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.15 0.15 0.15 1</ambient>
+          <diffuse>0.2 0.2 0.2 1</diffuse>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/carbon_fiber.png</albedo_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+      <!-- Motor Mount Pods & CNC Brushless Motor Bells -->
+      <!-- Motor Pod 0 (Front Right) -->
+      <visual name="motor_0_mount">
+        <pose>0.27 0.27 0.02 0 0 0</pose>
+        <geometry><cylinder><radius>0.026</radius><length>0.04</length></cylinder></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse></material>
+      </visual>
+      <visual name="motor_0_bell">
+        <pose>0.27 0.27 0.045 0 0 0</pose>
+        <geometry><cylinder><radius>0.022</radius><length>0.02</length></cylinder></geometry>
+        <material><ambient>0.8 0.4 0.1 1</ambient><diffuse>0.9 0.45 0.1 1</diffuse><specular>0.9 0.9 0.9 1</specular></material>
+      </visual>
+
+      <!-- Motor Pod 1 (Front Left) -->
+      <visual name="motor_1_mount">
+        <pose>0.27 -0.27 0.02 0 0 0</pose>
+        <geometry><cylinder><radius>0.026</radius><length>0.04</length></cylinder></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse></material>
+      </visual>
+      <visual name="motor_1_bell">
+        <pose>0.27 -0.27 0.045 0 0 0</pose>
+        <geometry><cylinder><radius>0.022</radius><length>0.02</length></cylinder></geometry>
+        <material><ambient>0.8 0.4 0.1 1</ambient><diffuse>0.9 0.45 0.1 1</diffuse><specular>0.9 0.9 0.9 1</specular></material>
+      </visual>
+
+      <!-- Motor Pod 2 (Rear Right) -->
+      <visual name="motor_2_mount">
+        <pose>-0.27 0.27 0.02 0 0 0</pose>
+        <geometry><cylinder><radius>0.026</radius><length>0.04</length></cylinder></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse></material>
+      </visual>
+      <visual name="motor_2_bell">
+        <pose>-0.27 0.27 0.045 0 0 0</pose>
+        <geometry><cylinder><radius>0.022</radius><length>0.02</length></cylinder></geometry>
+        <material><ambient>0.8 0.4 0.1 1</ambient><diffuse>0.9 0.45 0.1 1</diffuse><specular>0.9 0.9 0.9 1</specular></material>
+      </visual>
+
+      <!-- Motor Pod 3 (Rear Left) -->
+      <visual name="motor_3_mount">
+        <pose>-0.27 -0.27 0.02 0 0 0</pose>
+        <geometry><cylinder><radius>0.026</radius><length>0.04</length></cylinder></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse></material>
+      </visual>
+      <visual name="motor_3_bell">
+        <pose>-0.27 -0.27 0.045 0 0 0</pose>
+        <geometry><cylinder><radius>0.022</radius><length>0.02</length></cylinder></geometry>
+        <material><ambient>0.8 0.4 0.1 1</ambient><diffuse>0.9 0.45 0.1 1</diffuse><specular>0.9 0.9 0.9 1</specular></material>
+      </visual>
+
+      <!-- ==================================================== -->
+      <!-- NAVIGATION LED STROBES (Aviation Standard)            -->
+      <!-- ==================================================== -->
+      <!-- Starboard (Right): Green Light -->
+      <visual name="nav_led_starboard">
+        <pose>0.28 0.28 0.01 0 0 0</pose>
+        <geometry><sphere><radius>0.012</radius></sphere></geometry>
+        <material>
+          <ambient>0.0 1.0 0.2 1</ambient>
+          <diffuse>0.0 1.0 0.2 1</diffuse>
+          <emissive>0.0 1.0 0.2 1</emissive>
+        </material>
+      </visual>
+
+      <!-- Port (Left): Red Light -->
+      <visual name="nav_led_port">
+        <pose>0.28 -0.28 0.01 0 0 0</pose>
+        <geometry><sphere><radius>0.012</radius></sphere></geometry>
+        <material>
+          <ambient>1.0 0.0 0.0 1</ambient>
+          <diffuse>1.0 0.0 0.0 1</diffuse>
+          <emissive>1.0 0.0 0.0 1</emissive>
+        </material>
+      </visual>
+
+      <!-- Tail: High-Intensity White Strobe -->
+      <visual name="nav_led_tail">
+        <pose>-0.22 0 0.02 0 0 0</pose>
+        <geometry><sphere><radius>0.01</radius></sphere></geometry>
+        <material>
+          <ambient>1.0 1.0 1.0 1</ambient>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <emissive>1.0 1.0 1.0 1</emissive>
+        </material>
+      </visual>
+
+      <!-- ==================================================== -->
+      <!-- HEAVY-DUTY CARBON FIBER LANDING SKIDS                -->
+      <!-- ==================================================== -->
+      <!-- Right Skid Assembly -->
+      <visual name="skid_r_tube">
+        <pose>0 0.16 -0.16 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.01</radius><length>0.48</length></cylinder></geometry>
+        <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+      </visual>
+      <visual name="skid_r_leg_f">
+        <pose>0.14 0.16 -0.09 0 0.35 0</pose>
+        <geometry><cylinder><radius>0.009</radius><length>0.15</length></cylinder></geometry>
+        <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+      </visual>
+      <visual name="skid_r_leg_r">
+        <pose>-0.14 0.16 -0.09 0 -0.35 0</pose>
+        <geometry><cylinder><radius>0.009</radius><length>0.15</length></cylinder></geometry>
+        <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+      </visual>
+
+      <!-- Left Skid Assembly -->
+      <visual name="skid_l_tube">
+        <pose>0 -0.16 -0.16 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.01</radius><length>0.48</length></cylinder></geometry>
+        <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+      </visual>
+      <visual name="skid_l_leg_f">
+        <pose>0.14 -0.16 -0.09 0 0.35 0</pose>
+        <geometry><cylinder><radius>0.009</radius><length>0.15</length></cylinder></geometry>
+        <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+      </visual>
+      <visual name="skid_l_leg_r">
+        <pose>-0.14 -0.16 -0.09 0 -0.35 0</pose>
+        <geometry><cylinder><radius>0.009</radius><length>0.15</length></cylinder></geometry>
+        <material><ambient>0.15 0.15 0.15 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+      </visual>
+
+      <!-- Skid Collisions (ensures solid ground touchdown) -->
+      <collision name="skid_r_col">
+        <pose>0 0.16 -0.16 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.015</radius><length>0.48</length></cylinder></geometry>
+      </collision>
+      <collision name="skid_l_col">
+        <pose>0 -0.16 -0.16 1.5708 0 0</pose>
+        <geometry><cylinder><radius>0.015</radius><length>0.48</length></cylinder></geometry>
+      </collision>
+
+      <!-- ==================================================== -->
+      <!-- SECURE CARGO PAYLOAD BOX WITH OTP KEYPAD (SRS 4.8)    -->
+      <!-- ==================================================== -->
+      <visual name="cargo_payload_box">
+        <pose>0 0 -0.075 0 0 0</pose>
+        <geometry>
+          <box><size>0.28 0.22 0.13</size></box>
+        </geometry>
+        <material>
+          <ambient>0.9 0.45 0.05 1</ambient>
+          <diffuse>0.95 0.5 0.1 1</diffuse>
+          <specular>0.4 0.4 0.4 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>materials/textures/cargo_box.png</albedo_map>
+              <roughness>0.4</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+      <collision name="cargo_payload_col">
+        <pose>0 0 -0.075 0 0 0</pose>
+        <geometry>
+          <box><size>0.28 0.22 0.13</size></box>
+        </geometry>
+      </collision>
+
+      <!-- Solenoid Latch & Status Indicator LED -->
+      <visual name="cargo_lock_led">
+        <pose>0.142 0.06 -0.05 0 0 0</pose>
+        <geometry><sphere><radius>0.008</radius></sphere></geometry>
+        <material>
+          <ambient>0.0 0.8 1.0 1</ambient>
+          <diffuse>0.0 0.9 1.0 1</diffuse>
+          <emissive>0.0 0.8 1.0 1</emissive>
+        </material>
+      </visual>
+
+      <!-- ==================================================== -->
+      <!-- FORWARD COLLISION-AVOIDANCE LIDAR TURRET (SRS 5.1)   -->
+      <!-- ==================================================== -->
+      <visual name="lidar_turret_housing">
+        <pose>0.19 0 0.02 0 0 0</pose>
+        <geometry><cylinder><radius>0.035</radius><length>0.04</length></cylinder></geometry>
+        <material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+      </visual>
+      <visual name="lidar_glass_ring">
+        <pose>0.19 0 0.025 0 0 0</pose>
+        <geometry><cylinder><radius>0.033</radius><length>0.015</length></cylinder></geometry>
+        <material><ambient>0.1 0.4 0.8 1</ambient><diffuse>0.2 0.5 0.9 1</diffuse><specular>1 1 1 1</specular></material>
+      </visual>
+
+      <sensor name="forward_lidar" type="gpu_lidar">
+        <pose>0.19 0 0.025 0 0 0</pose>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>180</samples>
+              <resolution>1</resolution>
+              <min_angle>-1.5708</min_angle>
+              <max_angle>1.5708</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.15</min>
+            <max>30.0</max>
+            <resolution>0.02</resolution>
+          </range>
+        </ray>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+        <topic>/shopdrone/lidar</topic>
+      </sensor>
+
+      <!-- ==================================================== -->
+      <!-- DOWNWARD PRECISION-LANDING CAMERA (SRS 4.6 & 4.8)    -->
+      <!-- ==================================================== -->
+      <visual name="landing_cam_gimbal">
+        <pose>0.12 0 -0.06 0 1.5708 0</pose>
+        <geometry><cylinder><radius>0.018</radius><length>0.02</length></cylinder></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+      </visual>
+
+      <sensor name="downward_camera" type="camera">
+        <pose>0.12 0 -0.06 0 1.5708 0</pose>
+        <camera>
+          <horizontal_fov>1.396</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>100</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>20</update_rate>
+        <visualize>true</visualize>
+        <topic>/shopdrone/camera/image_raw</topic>
+      </sensor>
+    </link>
+
+    <!-- ==================================================== -->
+    <!-- HIGH-EFFICIENCY CARBON FIBER PROPELLER ROTORS         -->
+    <!-- ==================================================== -->
+    <!-- Rotor 0 (Front-Right, CCW) -->
+    <link name="rotor_0">
+      <pose>0.27 0.27 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.025</mass>
+        <inertia>
+          <ixx>0.0001</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.0001</iyy><iyz>0</iyz>
+          <izz>0.0002</izz>
+        </inertia>
+      </inertial>
+      <visual name="rotor_0_vis">
+        <geometry>
+          <mesh>
+            <uri>meshes/propeller.obj</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse><specular>0.8 0.8 0.8 1</specular></material>
+      </visual>
+    </link>
+    <joint name="rotor_0_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_0</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <!-- Rotor 1 (Front-Left, CW) -->
+    <link name="rotor_1">
+      <pose>0.27 -0.27 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.025</mass>
+        <inertia>
+          <ixx>0.0001</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.0001</iyy><iyz>0</iyz>
+          <izz>0.0002</izz>
+        </inertia>
+      </inertial>
+      <visual name="rotor_1_vis">
+        <geometry>
+          <mesh>
+            <uri>meshes/propeller.obj</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse><specular>0.8 0.8 0.8 1</specular></material>
+      </visual>
+    </link>
+    <joint name="rotor_1_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <!-- Rotor 2 (Rear-Right, CW) -->
+    <link name="rotor_2">
+      <pose>-0.27 0.27 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.025</mass>
+        <inertia>
+          <ixx>0.0001</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.0001</iyy><iyz>0</iyz>
+          <izz>0.0002</izz>
+        </inertia>
+      </inertial>
+      <visual name="rotor_2_vis">
+        <geometry>
+          <mesh>
+            <uri>meshes/propeller.obj</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse><specular>0.8 0.8 0.8 1</specular></material>
+      </visual>
+    </link>
+    <joint name="rotor_2_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <!-- Rotor 3 (Rear-Left, CCW) -->
+    <link name="rotor_3">
+      <pose>-0.27 -0.27 0.06 0 0 0</pose>
+      <inertial>
+        <mass>0.025</mass>
+        <inertia>
+          <ixx>0.0001</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.0001</iyy><iyz>0</iyz>
+          <izz>0.0002</izz>
+        </inertia>
+      </inertial>
+      <visual name="rotor_3_vis">
+        <geometry>
+          <mesh>
+            <uri>meshes/propeller.obj</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.15 0.15 0.15 1</diffuse><specular>0.8 0.8 0.8 1</specular></material>
+      </visual>
+    </link>
+    <joint name="rotor_3_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>rotor_3</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <!-- ==================================================== -->
+    <!-- GAZEBO HARMONIC AUTOPILOT & ODOMETRY PLUGINS         -->
+    <!-- ==================================================== -->
+    <plugin
+      filename="gz-sim-velocity-control-system"
+      name="gz::sim::systems::VelocityControl">
+      <topic>/cmd_vel</topic>
+    </plugin>
+
+    <plugin
+      filename="gz-sim-odometry-publisher-system"
+      name="gz::sim::systems::OdometryPublisher">
+      <odom_topic>/odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+      <dimensions>3</dimensions>
+    </plugin>
+  </model>
+</sdf>
