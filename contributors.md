@@ -10,14 +10,14 @@ Contributors:
 
     Melissa S Dube        - Software engineer
     
-    Prince Mubayi         -Chief security officer
+    Prince Mubayi         - Chief security officer
 
-    Siyabonga P Khumalo    -System's Engineer
+    Siyabonga P Khumalo    - System's Engineer
     
-    Isaac Madyauta.        -Database administrator
+    Isaac Madyauta.        - Database administrator
     
-    Lisa Tshenamo           -Systems  Engineer
+    Lisa Tshenamo           - Programmer
     
-    Vongai Mukwakwami       -AI/ML engineer 
+    Vongai Mukwakwami       - AI/ML engineer 
 
     Daphne P Ncube          - Network Engineer
