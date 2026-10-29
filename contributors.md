@@ -6,13 +6,16 @@ Contributors:
     
     Hopewell Z Ndlovu – Test Programmer
 
-    Mphathisi Ndlovu     -  Programmer    
+    Mphathisi Ndlovu      -  Programmer    
 
     Melissa S Dube        - Software engineer
     
-    Prince Mubayi             -Chief security officer
+    Prince Mubayi         -Chief security officer
 
-    Siyabonga P Khumalo    - System's Engineer
-    Isaac Madyauta.        - Database administrator 
-    Lisa Tshenamo _   systems  Engineer 
- Vongai Mukwakwami - AI/ML engineer 
+    Siyabonga P Khumalo    -System's Engineer
+    
+    Isaac Madyauta.        -Database administrator
+    
+    Lisa Tshenamo           -Systems  Engineer
+    
+    Vongai Mukwakwami       -AI/ML engineer 
