@@ -8,7 +8,7 @@
 
 > **Project Lead / Author:** Mphathisi Ndlovu (`n02529052a@nust.ac.zw`)  
 > **Institution:** National University of Science and Technology (NUST), Zimbabwe  
-> **Documentation:** [Collaborators Directory](collaborators.md) | [Agent Instructions](AGENTS.md) | [Simulation Guide](docs/ShopDrone_Simulation_Guide.html)
+> **Documentation:** [System Architecture](docs/system_architecture.md) | [Collaborators Directory](collaborators.md) | [Agent Instructions](AGENTS.md) | [Simulation Guide](docs/ShopDrone_Simulation_Guide.html)
 
 ---
 
@@ -122,44 +122,53 @@ The simulation directly realizes the engineering requirements for autonomous rur
 
 ### Option A: Native Host (Ubuntu 24.04 LTS / Linux Mint 22.1)
 
-Run the included automated installer script:
+From the repository root, run the included installer:
 
 ```bash
-cd "group project gazebo"
 sudo ./install_ros2_jazzy_gazebo.sh
 ```
 
 This script:
 1. Configures the Ubuntu `noble` repository and ROS 2 Jazzy GPG keys.
-2. Installs `ros-jazzy-desktop`, `ros-jazzy-ros-gz` (Gazebo Harmonic bridge), and build tools (`python3-colcon-common-extensions`).
-3. Automatically sets up workspace sourcing in `~/.bashrc`.
+2. Installs `ros-jazzy-ros-base`, `ros-jazzy-ros-gz` (Gazebo bridge), and build tools (`python3-colcon-common-extensions`).
+3. Adds ROS 2 Jazzy and Gazebo environment setup to `~/.bashrc`.
 
 ### Option B: Docker Environment (Zero-Install / Non-Root)
 
-To run inside an isolated Docker container with X11 display forwarding:
+On a Linux host with Docker and X11 available, run this from the repository root:
 
 ```bash
-cd "group project gazebo"
 ./docker/run_sim_docker.sh
 ```
+
+For the implemented software architecture and the pending hardware wiring information, see the [system architecture guide](docs/system_architecture.md).
 
 ---
 
 ## 7. Building the ROS 2 Workspace
 
-Once ROS 2 Jazzy is sourced:
+On Ubuntu 24.04 with ROS 2 Jazzy installed, run these commands from the repository root:
 
 ```bash
-cd "group project gazebo/ros2_ws"
-
 # Source ROS 2 Jazzy
 source /opt/ros/jazzy/setup.bash
+
+# Enter the workspace and install package dependencies
+cd ros2_ws
+rosdep update
+rosdep install --from-paths src --ignore-src --rosdistro jazzy -y
 
 # Build the workspace
 colcon build --symlink-install
 
 # Source workspace overlay
 source install/setup.bash
+```
+
+To run the repository's standalone verification script from the workspace:
+
+```bash
+python3 test_prototype.py
 ```
 
 ---
@@ -218,7 +227,7 @@ python3 ros2_ws/test_prototype.py
 ## 9. Project Directory Structure
 
 ```
-group project gazebo/
+egrocca/
 ├── README.md                          # Primary project documentation (this file)
 ├── collaborators.md                   # Collaborator directory, roles & onboarding
 ├── AGENTS.md                          # AI agent operating guidelines & instructions
@@ -227,6 +236,7 @@ group project gazebo/
 │   ├── Dockerfile                     # Docker container recipe
 │   └── run_sim_docker.sh              # Docker launch script with X11 display support
 ├── docs/
+│   ├── system_architecture.md         # Implemented software architecture and wiring status
 │   ├── images/
 │   │   └── rural_delivery_droid_concept.jpg # Concept render of the delivery droid
 │   └── ShopDrone_Simulation_Guide.html # Interactive documentation & simulation guide
