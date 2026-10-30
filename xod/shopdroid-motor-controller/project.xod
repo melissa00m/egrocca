@@ -1,0 +1,4 @@
+{
+  "description": "XOD Firmware for ShopDroid DC Motor Control, Differential Steering and Ultrasonic E-Stop",
+  "name": "shopdroid-motor-controller"
+}

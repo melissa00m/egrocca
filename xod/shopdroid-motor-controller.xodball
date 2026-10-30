@@ -1,0 +1,376 @@
+{
+  "name": "shopdroid-motor-controller",
+  "patches": {
+    "@/main": {
+      "description": "ShopDroid Motor Controller: Differential Steering and Ultrasonic E-Stop Logic",
+      "links": [
+        {
+          "id": "link_sub_to_clip_l",
+          "input": {
+            "nodeId": "CLIP_LEFT",
+            "pinKey": "Hk2H0A13-"
+          },
+          "output": {
+            "nodeId": "SUB_LEFT",
+            "pinKey": "HyRmUCdBDkZ"
+          }
+        },
+        {
+          "id": "link_add_to_clip_r",
+          "input": {
+            "nodeId": "CLIP_RIGHT",
+            "pinKey": "Hk2H0A13-"
+          },
+          "output": {
+            "nodeId": "ADD_RIGHT",
+            "pinKey": "SyomIRurDJ-"
+          }
+        },
+        {
+          "id": "link_sonar_to_less",
+          "input": {
+            "nodeId": "COMPARE_DIST",
+            "pinKey": "HJjZLRdBw1-"
+          },
+          "output": {
+            "nodeId": "SONAR_RANGE",
+            "pinKey": "BJllkG0Ub"
+          }
+        },
+        {
+          "id": "link_less_to_estop_l",
+          "input": {
+            "nodeId": "ESTOP_LEFT",
+            "pinKey": "S1yZIA_rDJZ"
+          },
+          "output": {
+            "nodeId": "COMPARE_DIST",
+            "pinKey": "HktZUCdrPkZ"
+          }
+        },
+        {
+          "id": "link_less_to_estop_r",
+          "input": {
+            "nodeId": "ESTOP_RIGHT",
+            "pinKey": "S1yZIA_rDJZ"
+          },
+          "output": {
+            "nodeId": "COMPARE_DIST",
+            "pinKey": "HktZUCdrPkZ"
+          }
+        },
+        {
+          "id": "link_estop_to_motor_l",
+          "input": {
+            "nodeId": "MOTOR_LEFT",
+            "pinKey": "SJpVAGRUW"
+          },
+          "output": {
+            "nodeId": "ESTOP_LEFT",
+            "pinKey": "S13xLCuHvkW"
+          }
+        },
+        {
+          "id": "link_estop_to_motor_r",
+          "input": {
+            "nodeId": "MOTOR_RIGHT",
+            "pinKey": "SJpVAGRUW"
+          },
+          "output": {
+            "nodeId": "ESTOP_RIGHT",
+            "pinKey": "S13xLCuHvkW"
+          }
+        },
+        {
+          "id": "rycexF-afl",
+          "input": {
+            "nodeId": "ESTOP_LEFT",
+            "pinKey": "r1AgIROHDJW"
+          },
+          "output": {
+            "nodeId": "CLIP_LEFT",
+            "pinKey": "BJRURA1nW"
+          }
+        },
+        {
+          "id": "Hy0leYZaMx",
+          "input": {
+            "nodeId": "ESTOP_RIGHT",
+            "pinKey": "r1AgIROHDJW"
+          },
+          "output": {
+            "nodeId": "CLIP_RIGHT",
+            "pinKey": "BJRURA1nW"
+          }
+        },
+        {
+          "id": "SJ3XtY-pfe",
+          "input": {
+            "nodeId": "SUB_LEFT",
+            "pinKey": "BypX80uSD1Z"
+          },
+          "output": {
+            "nodeId": "ByKtDYWafe",
+            "pinKey": "Sk43MO-Jm"
+          }
+        },
+        {
+          "id": "ByfQh9bTfl",
+          "input": {
+            "nodeId": "SkpMn5Zpzg",
+            "pinKey": "HkeKDhI-7"
+          },
+          "output": {
+            "nodeId": "rJ-5tKb6zl",
+            "pinKey": "Sk450OL-X"
+          }
+        },
+        {
+          "id": "SkrQ2qbafg",
+          "input": {
+            "nodeId": "SJym3qbTzg",
+            "pinKey": "HkeKDhI-7"
+          },
+          "output": {
+            "nodeId": "rJ-5tKb6zl",
+            "pinKey": "Sk450OL-X"
+          }
+        },
+        {
+          "id": "SkDQ35WaMx",
+          "input": {
+            "nodeId": "H1WcDtW6Me",
+            "pinKey": "S113G_ZJm"
+          },
+          "output": {
+            "nodeId": "SJym3qbTzg",
+            "pinKey": "Skw_dnU-Q"
+          }
+        },
+        {
+          "id": "B1YQh5bTMx",
+          "input": {
+            "nodeId": "ByKtDYWafe",
+            "pinKey": "S113G_ZJm"
+          },
+          "output": {
+            "nodeId": "SkpMn5Zpzg",
+            "pinKey": "Skw_dnU-Q"
+          }
+        },
+        {
+          "id": "H1d93qbTfg",
+          "input": {
+            "nodeId": "SUB_LEFT",
+            "pinKey": "rkJ4URuHDJ-"
+          },
+          "output": {
+            "nodeId": "H1WcDtW6Me",
+            "pinKey": "Sk43MO-Jm"
+          }
+        },
+        {
+          "id": "BJmj3qbpzl",
+          "input": {
+            "nodeId": "ADD_RIGHT",
+            "pinKey": "BJnQUR_BwyZ"
+          },
+          "output": {
+            "nodeId": "ByKtDYWafe",
+            "pinKey": "Sk43MO-Jm"
+          }
+        },
+        {
+          "id": "HkHj25b6Gl",
+          "input": {
+            "nodeId": "ADD_RIGHT",
+            "pinKey": "HkqmLAOrD1W"
+          },
+          "output": {
+            "nodeId": "H1WcDtW6Me",
+            "pinKey": "Sk43MO-Jm"
+          }
+        }
+      ],
+      "nodes": [
+        {
+          "description": "Calculate Left Motor Speed: V - W",
+          "id": "SUB_LEFT",
+          "position": {
+            "units": "slots",
+            "x": 1,
+            "y": 1
+          },
+          "type": "xod/core/subtract"
+        },
+        {
+          "description": "Calculate Right Motor Speed: V + W",
+          "id": "ADD_RIGHT",
+          "position": {
+            "units": "slots",
+            "x": 4,
+            "y": 1
+          },
+          "type": "xod/core/add"
+        },
+        {
+          "boundLiterals": {
+            "H1WURCknW": "-1",
+            "Hy_U0013b": "1"
+          },
+          "description": "Clamp Left Motor speed to [-1.0, 1.0]",
+          "id": "CLIP_LEFT",
+          "position": {
+            "units": "slots",
+            "x": 3,
+            "y": 2
+          },
+          "type": "xod/math/clip"
+        },
+        {
+          "boundLiterals": {
+            "H1WURCknW": "-1",
+            "Hy_U0013b": "1"
+          },
+          "description": "Clamp Right Motor speed to [-1.0, 1.0]",
+          "id": "CLIP_RIGHT",
+          "position": {
+            "units": "slots",
+            "x": 7,
+            "y": 2
+          },
+          "type": "xod/math/clip"
+        },
+        {
+          "boundLiterals": {
+            "SJmoRbAUW": "Continuously",
+            "r1xoR-C8-": "D3",
+            "rJa50WCL-": "D2"
+          },
+          "description": "HC-SR04 Ultrasonic Distance Sensor: TRIG on D2, ECHO on D3",
+          "id": "SONAR_RANGE",
+          "position": {
+            "units": "slots",
+            "x": 7,
+            "y": 0
+          },
+          "type": "xod/common-hardware/hc-sr04-ultrasonic-range"
+        },
+        {
+          "boundLiterals": {
+            "SJqZ8COrDkW": "0.30"
+          },
+          "description": "Emergency Stop Threshold: Distance < 0.30 meters (30 cm)",
+          "id": "COMPARE_DIST",
+          "position": {
+            "units": "slots",
+            "x": 7,
+            "y": 1
+          },
+          "type": "xod/core/less"
+        },
+        {
+          "boundLiterals": {
+            "ryTeUROHD1b": "0"
+          },
+          "description": "Left Motor E-Stop: If obstacle detected, override speed to 0.0",
+          "id": "ESTOP_LEFT",
+          "position": {
+            "units": "slots",
+            "x": 1,
+            "y": 3
+          },
+          "type": "xod/core/if-else(number)"
+        },
+        {
+          "boundLiterals": {
+            "ryTeUROHD1b": "0"
+          },
+          "description": "Right Motor E-Stop: If obstacle detected, override speed to 0.0",
+          "id": "ESTOP_RIGHT",
+          "position": {
+            "units": "slots",
+            "x": 5,
+            "y": 3
+          },
+          "type": "xod/core/if-else(number)"
+        },
+        {
+          "boundLiterals": {
+            "ByWU5i18H": "True",
+            "HknX0fRU-": "D5",
+            "S18NCzAIb": "D4"
+          },
+          "description": "Left Motor Driver (L298N): DIR on D4, PWM on D5",
+          "id": "MOTOR_LEFT",
+          "position": {
+            "units": "slots",
+            "x": 1,
+            "y": 4
+          },
+          "type": "xod/common-hardware/h-bridge-dc-motor"
+        },
+        {
+          "boundLiterals": {
+            "ByWU5i18H": "True",
+            "HknX0fRU-": "D6",
+            "S18NCzAIb": "D7"
+          },
+          "description": "Right Motor Driver (L298N): DIR on D7, PWM on D6",
+          "id": "MOTOR_RIGHT",
+          "position": {
+            "units": "slots",
+            "x": 6,
+            "y": 4
+          },
+          "type": "xod/common-hardware/h-bridge-dc-motor"
+        },
+        {
+          "id": "ByKtDYWafe",
+          "position": {
+            "units": "slots",
+            "x": 1,
+            "y": 0
+          },
+          "type": "xod/bits/u8-to-number"
+        },
+        {
+          "id": "H1WcDtW6Me",
+          "position": {
+            "units": "slots",
+            "x": 4,
+            "y": 0
+          },
+          "type": "xod/bits/u8-to-number"
+        },
+        {
+          "id": "rJ-5tKb6zl",
+          "position": {
+            "units": "slots",
+            "x": 1,
+            "y": -2
+          },
+          "type": "xod/uart/uart-0"
+        },
+        {
+          "id": "SkpMn5Zpzg",
+          "position": {
+            "units": "slots",
+            "x": 1,
+            "y": -1
+          },
+          "type": "xod/uart/read-byte"
+        },
+        {
+          "id": "SJym3qbTzg",
+          "position": {
+            "units": "slots",
+            "x": 5,
+            "y": -1
+          },
+          "type": "xod/uart/read-byte"
+        }
+      ]
+    }
+  }
+}

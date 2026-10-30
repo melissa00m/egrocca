@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XOD Guide: Visual Programming for Microcontrollers & Robotics</title>
+  <meta name="description" content="A comprehensive visual guide explaining XOD, its core node-based dataflow architecture, hardware integrations, and how it controls microcontrollers in robotics.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0f18;
+      --bg-secondary: #111a28;
+      --bg-card: rgba(17, 26, 40, 0.75);
+      --bg-card-hover: rgba(23, 35, 54, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(56, 189, 248, 0.4);
+      --accent-cyan: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-purple: #a855f7;
+      --accent-rose: #f43f5e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #64748b;
+      --code-bg: #050911;
+      --node-bg: #1e293b;
+      --node-header: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 60%, rgba(56, 189, 248, 0.08) 0%, transparent 45%);
+      background-attachment: fixed;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 5rem;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.5rem;
+      background: rgba(17, 26, 40, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 9999px;
+      margin-bottom: 2rem;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+
+    .nav-brand span {
+      color: var(--accent-emerald);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-btn.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .nav-btn.switch {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--accent-rose);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .nav-btn.switch:hover {
+      background: rgba(244, 63, 94, 0.25);
+    }
+
+    /* Header Hero */
+    header {
+      background: linear-gradient(135deg, rgba(16, 26, 42, 0.85) 0%, rgba(10, 18, 30, 0.95) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 1.5rem;
+      padding: 2.8rem 2.2rem;
+      margin-bottom: 2.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-emerald), var(--accent-cyan), var(--accent-purple));
+    }
+
+    .badge-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-cyan { background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-lead {
+      font-size: 1.25rem;
+      color: #cbd5e1;
+      max-width: 900px;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    /* Section Styling */
+    section {
+      margin-bottom: 3rem;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      color: var(--text-main);
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 24px;
+      background: var(--accent-emerald);
+      border-radius: 4px;
+    }
+
+    /* Grid Cards */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.8rem;
+      display: inline-block;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .card-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* The 4 Concepts */
+    .concept-item {
+      display: flex;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+      padding: 1.2rem;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 0.8rem;
+      border-left: 3px solid var(--accent-emerald);
+    }
+
+    .concept-badge {
+      min-width: 44px;
+      height: 44px;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent-emerald);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    /* Interactive Simulation Sandbox */
+    .simulator-container {
+      background: linear-gradient(180deg, #0f172a 0%, #090e17 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 1.2rem;
+      padding: 2rem;
+      box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6);
+      margin-bottom: 2.5rem;
+    }
+
+    .sim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sim-canvas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background: radial-gradient(#1e293b 1px, transparent 1px);
+      background-size: 20px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      min-height: 280px;
+      position: relative;
+    }
+
+    /* Visual XOD Node Representation */
+    .xod-node {
+      background: var(--node-bg);
+      border: 2px solid #475569;
+      border-radius: 0.75rem;
+      width: 220px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .xod-node.active-node {
+      border-color: var(--accent-emerald);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .node-title-bar {
+      background: var(--node-header);
+      padding: 0.5rem 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #f8fafc;
+      border-top-left-radius: 0.6rem;
+      border-top-right-radius: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .node-body {
+      padding: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .pin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    .pin {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #64748b;
+      display: inline-block;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .pin-active {
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+
+    .pin-pulse {
+      background: var(--accent-amber);
+      box-shadow: 0 0 8px var(--accent-amber);
+    }
+
+    .wire-indicator {
+      display: flex;
+      align-items: center;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 1.5rem;
+      animation: pulseWire 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseWire {
+      0%, 100% { opacity: 0.4; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    /* Controls inside Sim */
+    .sim-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+      padding: 1.2rem;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 0.8rem;
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-grow: 1;
+    }
+
+    .slider-group input[type="range"] {
+      flex-grow: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: #334155;
+      outline: none;
+      accent-color: var(--accent-emerald);
+      cursor: pointer;
+    }
+
+    .btn {
+      background: var(--accent-emerald);
+      color: #031e13;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      padding: 0.6rem 1.4rem;
+      border-radius: 0.6rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      background: #34d399;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Output status */
+    .status-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+    }
+
+    .status-safe {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .status-warn {
+      background: rgba(244, 63, 94, 0.2);
+      color: var(--accent-rose);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+    }
+
+    /* Code Blocks */
+    .code-container {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.8rem;
+      padding: 1.2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      overflow-x: auto;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    .code-comment { color: #64748b; }
+    .code-keyword { color: #38bdf8; font-weight: 600; }
+    .code-type { color: #a855f7; }
+    .code-func { color: #10b981; }
+
+    /* Comparison Table */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      background: var(--bg-card);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 1rem 1.4rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      font-weight: 600;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding-top: 2rem;
+      margin-top: 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Top Nav -->
+    <nav class="nav-bar">
+      <a href="index.html" class="nav-brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span>XOD</span> Architect
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-btn active">XOD Guide</a>
+        <a href="../nodered/index.html" class="nav-btn switch">
+          Switch to Node-RED Guide &rarr;
+        </a>
+      </div>
+    </nav>
+
+    <!-- Header Hero -->
+    <header>
+      <div class="badge-group">
+        <span class="badge badge-emerald">Microcontroller Firmware</span>
+        <span class="badge badge-cyan">Visual Dataflow</span>
+        <span class="badge badge-purple">Compiles to Native C++</span>
+      </div>
+      <h1>What is XOD & How Does It Work?</h1>
+      <p class="hero-lead">
+        XOD is an open-source visual programming environment that allows you to program microcontrollers (like Arduino, ESP32, and STM32) without typing traditional C/C++ code. It uses visual nodes and data links to control sensors, motors, and hardware.
+      </p>
+    </header>
+
+    <!-- Core Philosophy -->
+    <section>
+      <h2 class="section-title">Core Principles of XOD</h2>
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-icon">🧩</div>
+          <h3 class="card-title">Everything is a Node</h3>
+          <p class="card-desc">Sensors, math calculations, timers, logic checks, and motor outputs are represented as modular graphic blocks.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3 class="card-title">Zero Syntax Errors</h3>
+          <p class="card-desc">Forget missing semicolons, incorrect pointer dereferences, or syntax typos. XOD links enforce strict data typing visually.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚙️</div>
+          <h3 class="card-title">True Native C++</h3>
+          <p class="card-desc">XOD is not an interpreted toy; it transcompiles your visual graph directly into optimized C++ and flashes the MCU's ROM.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🤖</div>
+          <h3 class="card-title">Hardware Abstraction</h3>
+          <p class="card-desc">Work with abstract concepts like "distance in meters" or "motor speed (-1 to 1)" instead of raw bit registers and timer prescalers.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Simulation -->
+    <section>
+      <h2 class="section-title">Interactive Simulation: Visual Node Dataflow</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        See how XOD works under the hood. Move the distance slider below to trigger real-time updates through the simulated ultrasonic sensor, threshold comparator, and automated cargo latch.
+      </p>
+
+      <div class="simulator-container">
+        <div class="sim-header">
+          <div>
+            <h3 style="color: #fff; font-size: 1.2rem;">Live Patch: Obstacle Detector & Emergency Latch</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Data pulses travel from Left (Sensor) &rarr; Center (Logic) &rarr; Right (Actuator)</p>
+          </div>
+          <div id="simStatusBadge" class="status-display status-safe">
+            STATUS: PATH CLEAR & SECURED
+          </div>
+        </div>
+
+        <div class="sim-canvas">
+          <!-- Node 1: HC-SR04 Sensor -->
+          <div class="xod-node active-node" id="nodeSensor">
+            <div class="node-title-bar">
+              <span>hc-sr04-sonar</span>
+              <span>⚡</span>
+            </div>
+            <div class="node-body">
+              <div class="pin-row">
+                <span>PORT</span>
+                <span class="pin pin-active" title="Pin Port D7"></span>
+              </div>
+              <div class="pin-row">
+                <span>TRIG</span>
+                <span class="pin pin-pulse" title="Pulse Trigger"></span>
+              </div>
+              <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 0.2rem 0;"></div>
+              <div class="pin-row">
+                <span style="color: var(--accent-cyan);">DIST (m)</span>
+                <span id="pinDistVal" style="font-weight:700; color:#fff;">0.85</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="wire-indicator">&rarr;</div>
+
+          <!-- Node 2: Comparison Node -->
+          <div class="xod-node" id="nodeCompare">
+            <div class="node-title-bar">
+              <span>less-than</span>
+              <span>&lt;</span>
+            </div>
+            <div class="node-body">
+              <div class="pin-row">
+                <span>IN1</span>
+                <span id="pinIn1" style="color: #fff;">0.85</span>
+              </div>
+              <div class="pin-row">
+                <span>IN2 (Thresh)</span>
+                <span style="color: var(--accent-amber);">0.30</span>
+              </div>
+              <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 0.2rem 0;"></div>
+              <div class="pin-row">
+                <span style="color: var(--accent-emerald);">OUT (Bool)</span>
+                <span id="pinOutBool" style="font-weight:700; color:var(--accent-emerald);">False</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="wire-indicator">&rarr;</div>
+
+          <!-- Node 3: Actuator / Lock Servo -->
+          <div class="xod-node" id="nodeActuator">
+            <div class="node-title-bar">
+              <span>servo-lock</span>
+              <span>🔒</span>
+            </div>
+            <div class="node-body">
+              <div class="pin-row">
+                <span>STATE</span>
+                <span id="pinLockState" style="color: #fff;">LOCKED (0°)</span>
+              </div>
+              <div class="pin-row">
+                <span>BRAKE</span>
+                <span id="pinBrakeState" style="color: var(--text-dim);">RELEASED</span>
+              </div>
+              <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 0.2rem 0;"></div>
+              <div class="pin-row">
+                <span>SAFETY PIN</span>
+                <span class="pin pin-active" id="pinActuatorOut"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulator Interactive Slider -->
+        <div class="sim-controls">
+          <div class="slider-group">
+            <label for="distanceSlider" style="font-size: 0.95rem; font-weight: 500; color: #cbd5e1; min-width: 170px;">
+              Simulated Distance: <span id="sliderLabel" style="color: var(--accent-cyan); font-weight: 700;">0.85 m</span>
+            </label>
+            <input type="range" id="distanceSlider" min="0.05" max="2.00" step="0.05" value="0.85">
+          </div>
+          <button id="pulseBtn" class="btn" onclick="triggerHardwarePulse()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Send Sensor Pulse
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- The 4 Core Anatomy Items -->
+    <section>
+      <h2 class="section-title">The Anatomy of a XOD Program</h2>
+      <div class="grid-2">
+        <div class="concept-item">
+          <div class="concept-badge">1</div>
+          <div>
+            <h3 style="color: #fff; margin-bottom: 0.3rem;">Nodes</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+              The atomic operations. Built-in nodes include digital/analog I/O, mathematical operations, logic branches, PID loops, and specific sensor drivers like DHT11 or MPU6050.
+            </p>
+          </div>
+        </div>
+
+        <div class="concept-item">
+          <div class="concept-badge">2</div>
+          <div>
+            <h3 style="color: #fff; margin-bottom: 0.3rem;">Pins</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+              Top pins are inputs; bottom pins are outputs. Pins are strictly typed: <code>Number</code>, <code>Boolean</code>, <code>String</code>, <code>Byte</code>, and the special <code>Pulse</code> type (an instantaneous execution tick).
+            </p>
+          </div>
+        </div>
+
+        <div class="concept-item">
+          <div class="concept-badge">3</div>
+          <div>
+            <h3 style="color: #fff; margin-bottom: 0.3rem;">Links (Wires)</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+              Lines that link an output pin of one node to the input pin of another node. When an upstream node finishes calculation or produces a pulse, data immediately flows downstream.
+            </p>
+          </div>
+        </div>
+
+        <div class="concept-item">
+          <div class="concept-badge">4</div>
+          <div>
+            <h3 style="color: #fff; margin-bottom: 0.3rem;">Patches</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+              The canvas workspace. A patch in XOD is equivalent to a source code file or a function. You can create custom nodes by wrapping an entire patch into a reusable new node!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Transpilation Section -->
+    <section>
+      <h2 class="section-title">Visual Node Graph vs. Transpiled C++</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.2rem;">
+        When you click <strong>Deploy &rarr; Flash</strong> in XOD, your graphical patch is converted into standard Arduino-compatible C++ code before invoking <code>avr-gcc</code>:
+      </p>
+
+      <div class="grid-2">
+        <div class="card" style="background: #090e17;">
+          <h4 style="color: var(--accent-cyan); margin-bottom: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;">
+            [XOD Graphical Patch Representation]
+          </h4>
+          <div class="code-container">
+            <span class="code-comment"># XOD Schema Definition (Excerpt)</span><br>
+            <span class="code-keyword">node</span> ultrasonic_reader {<br>
+            &nbsp;&nbsp;type: <span class="code-type">xod/sonar/hc-sr04</span>;<br>
+            &nbsp;&nbsp;trig_pin: <span class="code-keyword">D7</span>;<br>
+            &nbsp;&nbsp;echo_pin: <span class="code-keyword">D8</span>;<br>
+            &nbsp;&nbsp;output -> <span class="code-func">comparator.input</span>;<br>
+            }
+          </div>
+        </div>
+
+        <div class="card" style="background: #090e17;">
+          <h4 style="color: var(--accent-emerald); margin-bottom: 0.8rem; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;">
+            [Compiled Equivalent Native C++]
+          </h4>
+          <div class="code-container">
+            <span class="code-type">void</span> <span class="code-func">evaluate</span>(Context ctx) {<br>
+            &nbsp;&nbsp;<span class="code-type">float</span> dist = readUltrasonic(<span class="code-keyword">7</span>, <span class="code-keyword">8</span>);<br>
+            &nbsp;&nbsp;<span class="code-keyword">if</span> (dist &lt; <span class="code-type">0.30f</span>) {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;digitalWrite(<span class="code-keyword">LED_BUILTIN</span>, HIGH);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;triggerEmergencyBrake();<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparative Table -->
+    <section>
+      <h2 class="section-title">When Should You Use XOD?</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Criteria</th>
+              <th>XOD Visual Nodes</th>
+              <th>Traditional C / C++ (Arduino IDE)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Best For</strong></td>
+              <td>Rapid prototyping, sensor-to-actuator wiring, students, robotics clubs</td>
+              <td>Complex mathematical algorithms, memory-critical tight loops, custom drivers</td>
+            </tr>
+            <tr>
+              <td><strong>Learning Curve</strong></td>
+              <td>Very low — connect visual blocks</td>
+              <td>Moderate to high — requires syntax, pointers, and memory awareness</td>
+            </tr>
+            <tr>
+              <td><strong>Bugs & Typos</strong></td>
+              <td>Eliminated — type safety is enforced by wire matching</td>
+              <td>Common compiler and linking errors</td>
+            </tr>
+            <tr>
+              <td><strong>Performance</strong></td>
+              <td>Near-native (transpiled to C++ without garbage collection)</td>
+              <td>100% native fine-tuned hardware optimization</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div>
+        <span>Project: <strong>ShopDroid All-Terrain Delivery</strong></span> | 
+        <span>Target: <strong>Microcontroller Firmware (XOD)</strong></span>
+      </div>
+      <div>
+        <a href="../nodered/index.html" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">
+          Explore Node-RED Architecture &rarr;
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const slider = document.getElementById('distanceSlider');
+    const sliderLabel = document.getElementById('sliderLabel');
+    const pinDistVal = document.getElementById('pinDistVal');
+    const pinIn1 = document.getElementById('pinIn1');
+    const pinOutBool = document.getElementById('pinOutBool');
+    const pinLockState = document.getElementById('pinLockState');
+    const pinBrakeState = document.getElementById('pinBrakeState');
+    const simStatusBadge = document.getElementById('simStatusBadge');
+    const nodeCompare = document.getElementById('nodeCompare');
+    const nodeActuator = document.getElementById('nodeActuator');
+
+    function updateSimulation(val) {
+      const distance = parseFloat(val).toFixed(2);
+      sliderLabel.textContent = distance + ' m';
+      pinDistVal.textContent = distance;
+      pinIn1.textContent = distance;
+
+      const isCollisionHazard = parseFloat(distance) < 0.30;
+
+      if (isCollisionHazard) {
+        pinOutBool.textContent = 'True';
+        pinOutBool.style.color = 'var(--accent-rose)';
+        pinLockState.textContent = 'HOLD POSITION';
+        pinLockState.style.color = 'var(--accent-rose)';
+        pinBrakeState.textContent = 'ENGAGED 🛑';
+        pinBrakeState.style.color = 'var(--accent-rose)';
+
+        simStatusBadge.className = 'status-display status-warn';
+        simStatusBadge.textContent = '⚠️ HAZARD DETECTED: EMERGENCY BRAKE ACTIVE';
+
+        nodeCompare.style.borderColor = 'var(--accent-rose)';
+        nodeActuator.style.borderColor = 'var(--accent-rose)';
+      } else {
+        pinOutBool.textContent = 'False';
+        pinOutBool.style.color = 'var(--accent-emerald)';
+        pinLockState.textContent = 'LOCKED (0°)';
+        pinLockState.style.color = '#fff';
+        pinBrakeState.textContent = 'RELEASED';
+        pinBrakeState.style.color = 'var(--text-dim)';
+
+        simStatusBadge.className = 'status-display status-safe';
+        simStatusBadge.textContent = 'STATUS: PATH CLEAR & SECURED';
+
+        nodeCompare.style.borderColor = '#475569';
+        nodeActuator.style.borderColor = '#475569';
+      }
+    }
+
+    slider.addEventListener('input', (e) => {
+      updateSimulation(e.target.value);
+    });
+
+    function triggerHardwarePulse() {
+      const nodeSensor = document.getElementById('nodeSensor');
+      nodeSensor.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        nodeSensor.style.transform = 'scale(1)';
+      }, 150);
+      updateSimulation(slider.value);
+    }
+
+    // Initialize
+    updateSimulation(slider.value);
+  </script>
+</body>
+</html>
