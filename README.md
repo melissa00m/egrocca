@@ -187,6 +187,8 @@ To simultaneously launch **RViz2** with preconfigured LiDAR point clouds, odomet
 ros2 launch shopdrone_simulation simulation.launch.py rviz:=true
 ```
 
+For obstacle alert testing and the optional Node-RED dashboard, see the [Node-RED guide](docs/node_red_dashboard.md).
+
 ### B. Run Interactive Mission Dashboard
 To orchestrate a complete live delivery mission:
 
