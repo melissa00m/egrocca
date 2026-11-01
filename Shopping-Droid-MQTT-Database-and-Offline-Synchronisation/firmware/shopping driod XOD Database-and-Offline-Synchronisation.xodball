@@ -1,0 +1,265 @@
+{
+  "patches": {
+    "@/main": {
+      "nodes": {
+        "SyaVFkV6zl": {
+          "id": "SyaVFkV6zl",
+          "type": "jesuso/esp32-wifi/esp32-connect",
+          "position": {
+            "x": 6,
+            "y": 0,
+            "units": "slots"
+          }
+        },
+        "H1oX51NaGe": {
+          "id": "H1oX51NaGe",
+          "type": "xod/core/constant-string",
+          "position": {
+            "x": 5,
+            "y": -1,
+            "units": "slots"
+          },
+          "boundLiterals": {
+            "B1x2RV3eZ": "\"TemboDube\""
+          }
+        },
+        "r1-I5yNpfg": {
+          "id": "r1-I5yNpfg",
+          "type": "xod/core/constant-string",
+          "position": {
+            "x": 7,
+            "y": -1,
+            "units": "slots"
+          },
+          "boundLiterals": {
+            "B1x2RV3eZ": "\"dube1967\""
+          }
+        },
+        "By-6ikNafl": {
+          "id": "By-6ikNafl",
+          "type": "xod/core/constant-boolean",
+          "position": {
+            "x": 9,
+            "y": -1,
+            "units": "slots"
+          },
+          "boundLiterals": {
+            "VAL": "True"
+          }
+        },
+        "ry25Q-Epfe": {
+          "id": "ry25Q-Epfe",
+          "type": "nusabotid/nusabot-mqtt/publish",
+          "position": {
+            "x": 5,
+            "y": 3,
+            "units": "slots"
+          }
+        },
+        "ryjbEZVaGl": {
+          "id": "ryjbEZVaGl",
+          "type": "xod/core/constant-string",
+          "position": {
+            "x": 6,
+            "y": 2,
+            "units": "slots"
+          },
+          "boundLiterals": {
+            "B1x2RV3eZ": "\"driod/sensor\""
+          }
+        },
+        "rkftV-N6Gl": {
+          "id": "rkftV-N6Gl",
+          "type": "xod/core/constant-string",
+          "position": {
+            "x": 7,
+            "y": 2,
+            "units": "slots"
+          },
+          "boundLiterals": {
+            "B1x2RV3eZ": "\"distance \""
+          }
+        },
+        "H1PJrbVaMx": {
+          "id": "H1PJrbVaMx",
+          "type": "xod/core/constant-number",
+          "position": {
+            "x": 9,
+            "y": 2,
+            "units": "slots"
+          }
+        },
+        "SJFXrZ46Ml": {
+          "id": "SJFXrZ46Ml",
+          "type": "xod/core/constant-boolean",
+          "position": {
+            "x": 8,
+            "y": 2,
+            "units": "slots"
+          }
+        },
+        "BkrWez4pzl": {
+          "id": "BkrWez4pzl",
+          "type": "nusabotid/nusabot-mqtt/nusabot-device",
+          "position": {
+            "x": 10,
+            "y": 1,
+            "units": "slots"
+          },
+          "boundLiterals": {
+            "BkZBBaEsQN": "\"\"",
+            "HyMrBpViQN": "\"\"",
+            "r1rBTEoQN": "\"192.168.18.40\"",
+            "ByxHBa4oXE": "\"shopping_droid_01n\""
+          }
+        },
+        "Sy2FWGETGl": {
+          "id": "Sy2FWGETGl",
+          "type": "xod/core/clock",
+          "position": {
+            "x": -2,
+            "y": 0,
+            "units": "slots"
+          },
+          "boundLiterals": {
+            "B13SCNhl-": "5"
+          }
+        },
+        "H1VcZMVaMx": {
+          "id": "H1VcZMVaMx",
+          "type": "xod/core/gate",
+          "position": {
+            "x": -3,
+            "y": 2,
+            "units": "slots"
+          }
+        }
+      },
+      "links": {
+        "HJSYjy46zl": {
+          "id": "HJSYjy46zl",
+          "output": {
+            "nodeId": "H1oX51NaGe",
+            "pinKey": "B1x2RV3eZ"
+          },
+          "input": {
+            "nodeId": "SyaVFkV6zl",
+            "pinKey": "rkWugbwoO"
+          }
+        },
+        "r1KYskEpfe": {
+          "id": "r1KYskEpfe",
+          "output": {
+            "nodeId": "r1-I5yNpfg",
+            "pinKey": "B1x2RV3eZ"
+          },
+          "input": {
+            "nodeId": "SyaVFkV6zl",
+            "pinKey": "Hk--deWwsu"
+          }
+        },
+        "r1ab2kVpGg": {
+          "id": "r1ab2kVpGg",
+          "output": {
+            "nodeId": "By-6ikNafl",
+            "pinKey": "VAL"
+          },
+          "input": {
+            "nodeId": "SyaVFkV6zl",
+            "pinKey": "S1zZdeWDjO"
+          }
+        },
+        "B1PmN-E6zg": {
+          "id": "B1PmN-E6zg",
+          "output": {
+            "nodeId": "ryjbEZVaGl",
+            "pinKey": "B1x2RV3eZ"
+          },
+          "input": {
+            "nodeId": "ry25Q-Epfe",
+            "pinKey": "SyWgnXnJ4"
+          }
+        },
+        "HJx2V-Vpfx": {
+          "id": "HJx2V-Vpfx",
+          "output": {
+            "nodeId": "rkftV-N6Gl",
+            "pinKey": "B1x2RV3eZ"
+          },
+          "input": {
+            "nodeId": "ry25Q-Epfe",
+            "pinKey": "BJSrpWTyE"
+          }
+        },
+        "Byfer-NaMl": {
+          "id": "Byfer-NaMl",
+          "output": {
+            "nodeId": "H1PJrbVaMx",
+            "pinKey": "B1x2RV3eZ"
+          },
+          "input": {
+            "nodeId": "ry25Q-Epfe",
+            "pinKey": "S17WFtG4N"
+          }
+        },
+        "HkqmLWNTGl": {
+          "id": "HkqmLWNTGl",
+          "output": {
+            "nodeId": "SJFXrZ46Ml",
+            "pinKey": "VAL"
+          },
+          "input": {
+            "nodeId": "ry25Q-Epfe",
+            "pinKey": "SJMeKYf44"
+          }
+        },
+        "Sy_EVM4TGg": {
+          "id": "Sy_EVM4TGg",
+          "output": {
+            "nodeId": "Sy2FWGETGl",
+            "pinKey": "HJU8CE2lW"
+          },
+          "input": {
+            "nodeId": "H1VcZMVaMx",
+            "pinKey": "SJ-1mZPTz"
+          }
+        },
+        "H1mLEzE6Gx": {
+          "id": "H1mLEzE6Gx",
+          "output": {
+            "nodeId": "H1VcZMVaMx",
+            "pinKey": "OkPg7GDaW"
+          },
+          "input": {
+            "nodeId": "ry25Q-Epfe",
+            "pinKey": "ByQ4aXnyE"
+          }
+        },
+        "HknOVzE6zl": {
+          "id": "HknOVzE6zl",
+          "output": {
+            "nodeId": "BkrWez4pzl",
+            "pinKey": "rJg_d3hoy4"
+          },
+          "input": {
+            "nodeId": "ry25Q-Epfe",
+            "pinKey": "rkQTwbs2_"
+          }
+        },
+        "Hy3gSMVpfx": {
+          "id": "Hy3gSMVpfx",
+          "output": {
+            "nodeId": "SyaVFkV6zl",
+            "pinKey": "ryxbOxbwsu"
+          },
+          "input": {
+            "nodeId": "Sy2FWGETGl",
+            "pinKey": "BJJICN2lW"
+          }
+        }
+      },
+      "path": "@/main"
+    }
+  },
+  "name": "shopping-driod-xod-database-and-offline-synchronisation"
+}
