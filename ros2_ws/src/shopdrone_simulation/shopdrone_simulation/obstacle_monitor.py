@@ -26,6 +26,7 @@ class ObstacleMonitorNode(Node):
         # Subscribers
         self.create_subscription(LaserScan, '/scan', self.on_scan, 10)
         self.create_subscription(LaserScan, '/shopdrone/lidar', self.on_scan, 10)
+        self.create_subscription(LaserScan, '/shopdroid/lidar', self.on_scan, 10)
 
         self.last_state_was_blocked = False
         self.get_logger().info(f'ShopDrone Obstacle Monitor active. Safe margin: {self.safe_distance} m')

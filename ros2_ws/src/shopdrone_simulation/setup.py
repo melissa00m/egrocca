@@ -36,6 +36,7 @@ setup(
             'cargo_lock = shopdrone_simulation.cargo_lock:main',
             'battery_monitor = shopdrone_simulation.battery_monitor:main',
             'obstacle_monitor = shopdrone_simulation.obstacle_monitor:main',
+            'nodered_bridge = shopdrone_simulation.nodered_bridge:main',
             'telemetry_publisher = shopdrone_simulation.telemetry_publisher:main',
             'mission_runner = shopdrone_simulation.mission_runner:main',
         ],
