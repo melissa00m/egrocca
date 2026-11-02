@@ -1,0 +1,14 @@
+{
+  "name": "rural-delivery-compartment-lock",
+  "version": "1.0.0",
+  "description": "Secure RFID/NFC Compartment Lock & Anti-Tamper System for Rural Autonomous Delivery Droids",
+  "authors": [
+    "Rural Droid Logistics Engineering Team"
+  ],
+  "license": "MIT",
+  "dependencies": [
+    "xod/core",
+    "xod/common-hardware"
+  ]
+}
+

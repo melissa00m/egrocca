@@ -1,0 +1,274 @@
+[
+  {
+    "id": "tab_anti_tamper",
+    "type": "tab",
+    "label": "Rural Droid Anti-Tamper & Security Audit",
+    "disabled": false,
+    "info": "Monitors, logs, and triggers automated countermeasures for unauthorized physical access attempts on delivery droids."
+  },
+  {
+    "id": "tls_config_droid_fleet",
+    "type": "tls-config",
+    "name": "Droid Fleet mTLS Security Profile",
+    "certname": "nodered.crt",
+    "keyname": "nodered.key",
+    "caname": "ca.crt",
+    "servername": "localhost",
+    "verifyservercert": true,
+    "alpnprotocol": ""
+  },
+  {
+    "id": "mqtt_broker_droid_tls",
+    "type": "mqtt-broker",
+    "name": "Rural Fleet Mosquitto (mTLS:8883)",
+    "broker": "localhost",
+    "port": "8883",
+    "tls": "tls_config_droid_fleet",
+    "clientid": "nodered-security-monitor",
+    "autoConnect": true,
+    "usetls": true,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true
+  },
+  {
+    "id": "mqtt_in_tamper",
+    "type": "mqtt in",
+    "z": "tab_anti_tamper",
+    "name": "Tamper Sensor Ingest (TLS)",
+    "topic": "droid/+/tamper",
+    "qos": "2",
+    "datatype": "auto-detect",
+    "broker": "mqtt_broker_droid_tls",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 160,
+    "y": 140,
+    "wires": [
+      [
+        "json_parse_tamper"
+      ]
+    ]
+  },
+  {
+    "id": "json_parse_tamper",
+    "type": "json",
+    "z": "tab_anti_tamper",
+    "name": "Parse JSON Alert",
+    "property": "payload",
+    "action": "obj",
+    "pretty": false,
+    "x": 390,
+    "y": 140,
+    "wires": [
+      [
+        "fn_classify_tamper"
+      ]
+    ]
+  },
+  {
+    "id": "fn_classify_tamper",
+    "type": "function",
+    "z": "tab_anti_tamper",
+    "name": "Triage & Enrich Incident",
+    "func": "// Extract Droid ID from MQTT topic\nconst topicSegments = (msg.topic || '').split('/');\nconst droidId = topicSegments[1] || msg.payload.droid_id || 'UNKNOWN_DROID';\n\nconst raw = msg.payload;\nconst incidentId = 'INC-' + Date.now().toString(36).toUpperCase();\nconst timestamp = raw.timestamp || new Date().toISOString();\n\n// Determine severity based on sensor triggers\nlet severity = 'WARNING';\nlet requiresLockdown = false;\n\nconst eventType = raw.event_type || 'UNKNOWN_TAMPER_EVENT';\n\nif (eventType.includes('PRIED_OPEN') || \n    eventType.includes('CHASSIS_BREACH') || \n    eventType.includes('FORCE_ENTRY') ||\n    raw.sensors?.compartment_switch === 'BREACHED') {\n    severity = 'CRITICAL';\n    requiresLockdown = true;\n} else if (eventType.includes('MULTIPLE_UNAUTHORIZED_RFID') || raw.sensors?.rfid_failed_count >= 3) {\n    severity = 'HIGH';\n    requiresLockdown = true;\n} else if (raw.sensors?.vibration_g > 3.0 || raw.sensors?.imu_tilt_deg > 45) {\n    severity = 'WARNING';\n}\n\n// Build standardized security audit record\nconst auditRecord = {\n    incident_id: incidentId,\n    droid_id: droidId,\n    timestamp: timestamp,\n    severity: severity,\n    event_type: eventType,\n    details: raw.details || raw.reason || 'Sensor limit switch tripped without authorized unlock',\n    location: {\n        lat: raw.location?.latitude || raw.location?.lat || -29.8587,\n        lon: raw.location?.longitude || raw.location?.lon || 31.0218,\n        alt_m: raw.location?.altitude_m || 120.0\n    },\n    sensors: {\n        compartment_locked: raw.sensors?.compartment_locked ?? true,\n        door_switch_state: raw.sensors?.door_switch || 'OPEN',\n        rfid_failed_count: raw.sensors?.rfid_failed_count || 0,\n        tilt_deg: raw.sensors?.imu_tilt_deg || 0,\n        shock_g: raw.sensors?.vibration_g || 0\n    },\n    battery_pct: raw.battery_soc_pct || raw.battery?.soc_pct || 85\n};\n\n// Message 1 (Out 1): Formatted record for File Logger & Debug\n// Message 2 (Out 2): Automated Countermeasure (Lockdown command over MQTT)\nconst logMsg = {\n    ...msg,\n    payload: auditRecord,\n    incident_id: incidentId,\n    severity: severity\n};\n\nlet countermeasureMsg = null;\nif (requiresLockdown) {\n    countermeasureMsg = {\n        topic: `droid/${droidId}/command/lockdown`,\n        payload: {\n            command: 'ENGAGE_EMERGENCY_LOCKDOWN',\n            incident_id: incidentId,\n            droid_id: droidId,\n            timestamp: new Date().toISOString(),\n            actions: {\n                energize_secondary_deadbolt: true,\n                sound_alarm_siren: true,\n                flash_strobe_leds: true,\n                disable_drive_motors: true,\n                capture_camera_snapshot: true\n            }\n        }\n    };\n}\n\nreturn [logMsg, countermeasureMsg];",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 630,
+    "y": 140,
+    "wires": [
+      [
+        "fn_format_log_line",
+        "debug_incident_alert"
+      ],
+      [
+        "mqtt_out_lockdown",
+        "debug_countermeasures"
+      ]
+    ]
+  },
+  {
+    "id": "fn_format_log_line",
+    "type": "function",
+    "z": "tab_anti_tamper",
+    "name": "Format JSONL Record",
+    "func": "// Format as single-line JSON with trailing newline for continuous append\nmsg.payload = JSON.stringify(msg.payload) + '\\n';\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 900,
+    "y": 100,
+    "wires": [
+      [
+        "file_audit_logger"
+      ]
+    ]
+  },
+  {
+    "id": "file_audit_logger",
+    "type": "file",
+    "z": "tab_anti_tamper",
+    "name": "Append to tamper_audit.log",
+    "filename": "C:/Users/mubay/OneDrive/Documentos/egrocca certificates/node_red_tamper_system/logs/anti_tamper_audit.log",
+    "filenameType": "str",
+    "appendNewline": false,
+    "createDir": true,
+    "overwriteFile": "false",
+    "encoding": "utf8",
+    "x": 1180,
+    "y": 100,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "debug_incident_alert",
+    "type": "debug",
+    "z": "tab_anti_tamper",
+    "name": "CRITICAL Tamper Incident Alert",
+    "active": true,
+    "tosidebar": true,
+    "console": true,
+    "tostatus": true,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "payload.severity & ': ' & payload.event_type",
+    "statusType": "jsonata",
+    "x": 940,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "mqtt_out_lockdown",
+    "type": "mqtt out",
+    "z": "tab_anti_tamper",
+    "name": "Publish Droid Lockdown (TLS)",
+    "topic": "",
+    "qos": "2",
+    "retain": "false",
+    "respTopic": "",
+    "contentType": "application/json",
+    "userProps": "",
+    "correl": "",
+    "expiry": "",
+    "broker": "mqtt_broker_droid_tls",
+    "x": 930,
+    "y": 240,
+    "wires": []
+  },
+  {
+    "id": "debug_countermeasures",
+    "type": "debug",
+    "z": "tab_anti_tamper",
+    "name": "Lockdown Command Sent",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 920,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "test_tamper_pried",
+    "type": "inject",
+    "z": "tab_anti_tamper",
+    "name": "Test: Compartment Pried Open (CRITICAL)",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "droid/droid-alpha-01/tamper",
+    "payload": "{\"droid_id\":\"droid-alpha-01\",\"timestamp\":\"2026-11-02T12:00:00Z\",\"event_type\":\"COMPARTMENT_PRIED_OPEN_WHILE_LOCKED\",\"reason\":\"Reed switch opened without authorized RFID scan\",\"sensors\":{\"compartment_switch\":\"BREACHED\",\"door_switch\":\"OPEN\",\"rfid_failed_count\":0,\"vibration_g\":4.2,\"imu_tilt_deg\":12},\"location\":{\"latitude\":-29.8587,\"longitude\":31.0218,\"altitude_m\":124.5},\"battery_soc_pct\":86}",
+    "payloadType": "json",
+    "x": 230,
+    "y": 240,
+    "wires": [
+      [
+        "json_parse_tamper"
+      ]
+    ]
+  },
+  {
+    "id": "test_tamper_rfid_storm",
+    "type": "inject",
+    "z": "tab_anti_tamper",
+    "name": "Test: 3x Failed RFID Scan (HIGH)",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "droid/droid-alpha-01/tamper",
+    "payload": "{\"droid_id\":\"droid-alpha-01\",\"timestamp\":\"2026-11-02T12:05:00Z\",\"event_type\":\"MULTIPLE_UNAUTHORIZED_RFID_SCANS\",\"reason\":\"Customer key mismatch threshold exceeded (3 scans)\",\"sensors\":{\"compartment_switch\":\"SECURE\",\"door_switch\":\"CLOSED\",\"rfid_failed_count\":3,\"vibration_g\":0.2,\"imu_tilt_deg\":1},\"location\":{\"latitude\":-29.8592,\"longitude\":31.0234,\"altitude_m\":126.0},\"battery_soc_pct\":85}",
+    "payloadType": "json",
+    "x": 210,
+    "y": 300,
+    "wires": [
+      [
+        "json_parse_tamper"
+      ]
+    ]
+  },
+  {
+    "id": "test_tamper_chassis",
+    "type": "inject",
+    "z": "tab_anti_tamper",
+    "name": "Test: Chassis / Hull Breach (CRITICAL)",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "droid/droid-alpha-02/tamper",
+    "payload": "{\"droid_id\":\"droid-alpha-02\",\"timestamp\":\"2026-11-02T12:10:00Z\",\"event_type\":\"CHASSIS_BREACH_DETECTED\",\"reason\":\"Hull maintenance enclosure microswitch tripped during transit\",\"sensors\":{\"compartment_switch\":\"SECURE\",\"door_switch\":\"CLOSED\",\"rfid_failed_count\":0,\"vibration_g\":1.5,\"imu_tilt_deg\":28},\"location\":{\"latitude\":-29.8650,\"longitude\":31.0310,\"altitude_m\":140.2},\"battery_soc_pct\":91}",
+    "payloadType": "json",
+    "x": 220,
+    "y": 360,
+    "wires": [
+      [
+        "json_parse_tamper"
+      ]
+    ]
+  }
+]
+

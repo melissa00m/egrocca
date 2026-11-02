@@ -1,0 +1,115 @@
+{
+  "description": "Monitors invalid RFID attempts and physical pry/door breach while compartment is locked",
+  "nodes": [
+    {
+      "id": "in_denied_pulse",
+      "type": "xod/core/input-pulse",
+      "position": { "x": 0, "y": 0 },
+      "label": "ON_DENIED"
+    },
+    {
+      "id": "in_is_locked",
+      "type": "xod/core/input-boolean",
+      "position": { "x": 1, "y": 0 },
+      "label": "IS_LOCKED"
+    },
+    {
+      "id": "in_door_closed",
+      "type": "xod/core/input-boolean",
+      "position": { "x": 2, "y": 0 },
+      "label": "DOOR_CLOSED"
+    },
+    {
+      "id": "counter_fails",
+      "type": "xod/core/count",
+      "position": { "x": 0, "y": 1 }
+    },
+    {
+      "id": "cmp_fail_limit",
+      "type": "xod/core/greater-or-equal",
+      "position": { "x": 0, "y": 2 },
+      "boundValue": 3
+    },
+    {
+      "id": "gate_pry_tamper",
+      "type": "xod/core/and",
+      "position": { "x": 1, "y": 1 }
+    },
+    {
+      "id": "not_door",
+      "type": "xod/core/not",
+      "position": { "x": 2, "y": 1 }
+    },
+    {
+      "id": "or_alarm_trigger",
+      "type": "xod/core/or",
+      "position": { "x": 1, "y": 2 }
+    },
+    {
+      "id": "led_red_tamper",
+      "type": "xod/common-hardware/led",
+      "position": { "x": 0, "y": 3 },
+      "boundValue": 6
+    },
+    {
+      "id": "out_tamper_alert",
+      "type": "xod/core/output-pulse",
+      "position": { "x": 1, "y": 3 },
+      "label": "TAMPER_ALERT_PULSE"
+    },
+    {
+      "id": "out_tamper_active",
+      "type": "xod/core/output-boolean",
+      "position": { "x": 2, "y": 3 },
+      "label": "IS_TAMPER_ACTIVE"
+    }
+  ],
+  "links": [
+    {
+      "id": "l_denied_count",
+      "source": { "node": "in_denied_pulse", "pin": "OUT" },
+      "target": { "node": "counter_fails", "pin": "INC" }
+    },
+    {
+      "id": "l_count_cmp",
+      "source": { "node": "counter_fails", "pin": "OUT" },
+      "target": { "node": "cmp_fail_limit", "pin": "IN1" }
+    },
+    {
+      "id": "l_door_not",
+      "source": { "node": "in_door_closed", "pin": "OUT" },
+      "target": { "node": "not_door", "pin": "IN" }
+    },
+    {
+      "id": "l_locked_and",
+      "source": { "node": "in_is_locked", "pin": "OUT" },
+      "target": { "node": "gate_pry_tamper", "pin": "IN1" }
+    },
+    {
+      "id": "l_notdoor_and",
+      "source": { "node": "not_door", "pin": "OUT" },
+      "target": { "node": "gate_pry_tamper", "pin": "IN2" }
+    },
+    {
+      "id": "l_cmp_or",
+      "source": { "node": "cmp_fail_limit", "pin": "OUT" },
+      "target": { "node": "or_alarm_trigger", "pin": "IN1" }
+    },
+    {
+      "id": "l_pry_or",
+      "source": { "node": "gate_pry_tamper", "pin": "OUT" },
+      "target": { "node": "or_alarm_trigger", "pin": "IN2" }
+    },
+    {
+      "id": "l_or_led",
+      "source": { "node": "or_alarm_trigger", "pin": "OUT" },
+      "target": { "node": "led_red_tamper", "pin": "ACT" }
+    },
+    {
+      "id": "l_or_active",
+      "source": { "node": "or_alarm_trigger", "pin": "OUT" },
+      "target": { "node": "out_tamper_active", "pin": "IN" }
+    }
+  ]
+}
+

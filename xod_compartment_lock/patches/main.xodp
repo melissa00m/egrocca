@@ -1,0 +1,84 @@
+{
+  "description": "Master coordinator patch for Rural Delivery Droid Electronic Compartment Lock and Anti-Tamper System",
+  "nodes": [
+    {
+      "id": "rfid_reader",
+      "type": "xod-dev/mfrc522/mfrc522-reader",
+      "position": { "x": 0, "y": 0 },
+      "label": "RFID_RC522"
+    },
+    {
+      "id": "door_sensor",
+      "type": "xod/common-hardware/button",
+      "position": { "x": 3, "y": 0 },
+      "label": "REED_SWITCH_D2",
+      "boundValue": 2
+    },
+    {
+      "id": "validator",
+      "type": "@/rfid-validator",
+      "position": { "x": 0, "y": 1 }
+    },
+    {
+      "id": "solenoid_unit",
+      "type": "@/solenoid-controller",
+      "position": { "x": 0, "y": 2 }
+    },
+    {
+      "id": "tamper_unit",
+      "type": "@/tamper-detector",
+      "position": { "x": 2, "y": 2 }
+    },
+    {
+      "id": "out_tamper_pin_d3",
+      "type": "xod/core/digital-write",
+      "position": { "x": 2, "y": 3 },
+      "label": "TAMPER_SIG_TO_SBC",
+      "boundValue": 3
+    },
+    {
+      "id": "buzzer_chirp",
+      "type": "xod/common-hardware/buzzer",
+      "position": { "x": 1, "y": 3 },
+      "boundValue": 4
+    }
+  ],
+  "links": [
+    {
+      "id": "l_rfid_uid_to_val",
+      "source": { "node": "rfid_reader", "pin": "UID" },
+      "target": { "node": "validator", "pin": "SCANNED_UID" }
+    },
+    {
+      "id": "l_rfid_pulse_to_val",
+      "source": { "node": "rfid_reader", "pin": "READ" },
+      "target": { "node": "validator", "pin": "ON_READ" }
+    },
+    {
+      "id": "l_grant_to_lock",
+      "source": { "node": "validator", "pin": "ACCESS_GRANTED" },
+      "target": { "node": "solenoid_unit", "pin": "UNLOCK_TRIGGER" }
+    },
+    {
+      "id": "l_door_to_solenoid",
+      "source": { "node": "door_sensor", "pin": "PRESS" },
+      "target": { "node": "solenoid_unit", "pin": "DOOR_CLOSED" }
+    },
+    {
+      "id": "l_door_to_tamper",
+      "source": { "node": "door_sensor", "pin": "PRESS" },
+      "target": { "node": "tamper_unit", "pin": "DOOR_CLOSED" }
+    },
+    {
+      "id": "l_deny_to_tamper",
+      "source": { "node": "validator", "pin": "ACCESS_DENIED" },
+      "target": { "node": "tamper_unit", "pin": "ON_DENIED" }
+    },
+    {
+      "id": "l_tamper_alert_to_pin",
+      "source": { "node": "tamper_unit", "pin": "IS_TAMPER_ACTIVE" },
+      "target": { "node": "out_tamper_pin_d3", "pin": "SIG" }
+    }
+  ]
+}
+

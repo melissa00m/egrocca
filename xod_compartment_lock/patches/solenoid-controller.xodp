@@ -1,0 +1,100 @@
+{
+  "description": "Drives 12V Solenoid Compartment Lock with failsafe timer and door reed switch feedback",
+  "nodes": [
+    {
+      "id": "in_trigger",
+      "type": "xod/core/input-pulse",
+      "position": { "x": 0, "y": 0 },
+      "label": "UNLOCK_TRIGGER"
+    },
+    {
+      "id": "in_reed_switch",
+      "type": "xod/core/input-boolean",
+      "position": { "x": 2, "y": 0 },
+      "label": "DOOR_CLOSED"
+    },
+    {
+      "id": "in_timeout",
+      "type": "xod/core/input-number",
+      "position": { "x": 1, "y": 0 },
+      "label": "HOLD_TIME_SEC",
+      "boundValue": 10.0
+    },
+    {
+      "id": "ff_lock_state",
+      "type": "xod/core/flip-flop",
+      "position": { "x": 0, "y": 1 }
+    },
+    {
+      "id": "delay_relock",
+      "type": "xod/core/delay",
+      "position": { "x": 1, "y": 1 }
+    },
+    {
+      "id": "relay_solenoid",
+      "type": "xod/common-hardware/relay",
+      "position": { "x": 0, "y": 2 },
+      "boundValue": 7
+    },
+    {
+      "id": "led_success",
+      "type": "xod/common-hardware/led",
+      "position": { "x": 1, "y": 2 },
+      "boundValue": 5
+    },
+    {
+      "id": "out_is_unlocked",
+      "type": "xod/core/output-boolean",
+      "position": { "x": 0, "y": 3 },
+      "label": "IS_UNLOCKED"
+    },
+    {
+      "id": "out_relocked_pulse",
+      "type": "xod/core/output-pulse",
+      "position": { "x": 1, "y": 3 },
+      "label": "ON_RELOCKED"
+    }
+  ],
+  "links": [
+    {
+      "id": "l_trig_ff_set",
+      "source": { "node": "in_trigger", "pin": "OUT" },
+      "target": { "node": "ff_lock_state", "pin": "S" }
+    },
+    {
+      "id": "l_trig_delay_start",
+      "source": { "node": "in_trigger", "pin": "OUT" },
+      "target": { "node": "delay_relock", "pin": "IN" }
+    },
+    {
+      "id": "l_timeout_delay_t",
+      "source": { "node": "in_timeout", "pin": "OUT" },
+      "target": { "node": "delay_relock", "pin": "T" }
+    },
+    {
+      "id": "l_delay_timeout_reset_ff",
+      "source": { "node": "delay_relock", "pin": "OUT" },
+      "target": { "node": "ff_lock_state", "pin": "R" }
+    },
+    {
+      "id": "l_delay_timeout_out_pulse",
+      "source": { "node": "delay_relock", "pin": "OUT" },
+      "target": { "node": "out_relocked_pulse", "pin": "IN" }
+    },
+    {
+      "id": "l_ff_state_relay",
+      "source": { "node": "ff_lock_state", "pin": "MEM" },
+      "target": { "node": "relay_solenoid", "pin": "ACT" }
+    },
+    {
+      "id": "l_ff_state_led",
+      "source": { "node": "ff_lock_state", "pin": "MEM" },
+      "target": { "node": "led_success", "pin": "ACT" }
+    },
+    {
+      "id": "l_ff_state_out_unlocked",
+      "source": { "node": "ff_lock_state", "pin": "MEM" },
+      "target": { "node": "out_is_unlocked", "pin": "IN" }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "description": "Validates scanned RFID/NFC UID against authorized customer delivery token",
+  "nodes": [
+    {
+      "id": "in_uid",
+      "type": "xod/core/input-string",
+      "position": { "x": 0, "y": 0 },
+      "label": "SCANNED_UID"
+    },
+    {
+      "id": "in_read_pulse",
+      "type": "xod/core/input-pulse",
+      "position": { "x": 1, "y": 0 },
+      "label": "ON_READ"
+    },
+    {
+      "id": "in_target_uid",
+      "type": "xod/core/input-string",
+      "position": { "x": 2, "y": 0 },
+      "label": "AUTH_UID",
+      "boundValue": "E2 4B 89 1A"
+    },
+    {
+      "id": "cmp_equal",
+      "type": "xod/core/equal",
+      "position": { "x": 1, "y": 1 }
+    },
+    {
+      "id": "branch_match",
+      "type": "xod/core/branch",
+      "position": { "x": 1, "y": 2 }
+    },
+    {
+      "id": "out_granted",
+      "type": "xod/core/output-pulse",
+      "position": { "x": 0, "y": 3 },
+      "label": "ACCESS_GRANTED"
+    },
+    {
+      "id": "out_denied",
+      "type": "xod/core/output-pulse",
+      "position": { "x": 2, "y": 3 },
+      "label": "ACCESS_DENIED"
+    },
+    {
+      "id": "out_is_valid",
+      "type": "xod/core/output-boolean",
+      "position": { "x": 1, "y": 3 },
+      "label": "IS_VALID"
+    }
+  ],
+  "links": [
+    {
+      "id": "l_uid_cmp",
+      "source": { "node": "in_uid", "pin": "OUT" },
+      "target": { "node": "cmp_equal", "pin": "IN1" }
+    },
+    {
+      "id": "l_target_cmp",
+      "source": { "node": "in_target_uid", "pin": "OUT" },
+      "target": { "node": "cmp_equal", "pin": "IN2" }
+    },
+    {
+      "id": "l_cmp_is_valid",
+      "source": { "node": "cmp_equal", "pin": "OUT" },
+      "target": { "node": "out_is_valid", "pin": "IN" }
+    },
+    {
+      "id": "l_cmp_branch_cond",
+      "source": { "node": "cmp_equal", "pin": "OUT" },
+      "target": { "node": "branch_match", "pin": "COND" }
+    },
+    {
+      "id": "l_pulse_branch_in",
+      "source": { "node": "in_read_pulse", "pin": "OUT" },
+      "target": { "node": "branch_match", "pin": "IN" }
+    },
+    {
+      "id": "l_branch_true",
+      "source": { "node": "branch_match", "pin": "T" },
+      "target": { "node": "out_granted", "pin": "IN" }
+    },
+    {
+      "id": "l_branch_false",
+      "source": { "node": "branch_match", "pin": "F" },
+      "target": { "node": "out_denied", "pin": "IN" }
+    }
+  ]
+}
+

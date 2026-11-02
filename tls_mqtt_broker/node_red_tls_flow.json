@@ -1,0 +1,187 @@
+[
+  {
+    "id": "tab_tls_telemetry",
+    "type": "tab",
+    "label": "Rural Droid Encrypted Telemetry (TLS)",
+    "disabled": false,
+    "info": "Listens for encrypted telemetry and tamper alerts from rural delivery droids over TLS port 8883 using Mutual TLS (mTLS)."
+  },
+  {
+    "id": "tls_config_droid_fleet",
+    "type": "tls-config",
+    "name": "Droid Fleet mTLS Security Profile",
+    "certname": "nodered.crt",
+    "keyname": "nodered.key",
+    "caname": "ca.crt",
+    "servername": "localhost",
+    "verifyservercert": true,
+    "alpnprotocol": ""
+  },
+  {
+    "id": "mqtt_broker_droid_tls",
+    "type": "mqtt-broker",
+    "name": "Rural Fleet Mosquitto (mTLS:8883)",
+    "broker": "localhost",
+    "port": "8883",
+    "tls": "tls_config_droid_fleet",
+    "clientid": "nodered-fleet-dispatcher",
+    "autoConnect": true,
+    "usetls": true,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "dispatch/status",
+    "birthQos": "1",
+    "birthPayload": "{\"status\": \"ONLINE\", \"dispatcher\": \"node-red-hub\"}",
+    "birthMsg": {},
+    "closeTopic": "dispatch/status",
+    "closeQos": "1",
+    "closePayload": "{\"status\": \"OFFLINE\"}",
+    "closeMsg": {},
+    "willTopic": "dispatch/status",
+    "willQos": "1",
+    "willPayload": "{\"status\": \"DISCONNECTED_UNEXPECTEDLY\"}",
+    "willMsg": {}
+  },
+  {
+    "id": "mqtt_in_telemetry",
+    "type": "mqtt in",
+    "z": "tab_tls_telemetry",
+    "name": "Droid Fleet Telemetry",
+    "topic": "droid/+/telemetry",
+    "qos": "1",
+    "datatype": "auto-detect",
+    "broker": "mqtt_broker_droid_tls",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 160,
+    "y": 120,
+    "wires": [
+      [
+        "json_parse_telemetry"
+      ]
+    ]
+  },
+  {
+    "id": "json_parse_telemetry",
+    "type": "json",
+    "z": "tab_tls_telemetry",
+    "name": "Parse Telemetry JSON",
+    "property": "payload",
+    "action": "obj",
+    "pretty": false,
+    "x": 410,
+    "y": 120,
+    "wires": [
+      [
+        "telemetry_metrics_filter",
+        "debug_telemetry_stream"
+      ]
+    ]
+  },
+  {
+    "id": "telemetry_metrics_filter",
+    "type": "function",
+    "z": "tab_tls_telemetry",
+    "name": "Enrich & Validate Telemetry",
+    "func": "// Extract Droid ID from topic (e.g. droid/droid-alpha-01/telemetry)\nconst topicParts = msg.topic.split('/');\nconst droidId = topicParts[1] || msg.payload.droid_id || 'UNKNOWN_DROID';\n\nconst data = msg.payload;\n\n// Format unified fleet status record\nmsg.telemetry = {\n    droid_id: droidId,\n    timestamp: data.timestamp || new Date().toISOString(),\n    gps: {\n        lat: data.gps?.lat || 0,\n        lon: data.gps?.lon || 0,\n        alt_m: data.gps?.alt_m || 0,\n        speed_kmh: data.gps?.speed_kmh || 0\n    },\n    battery: {\n        voltage_v: data.battery?.voltage || 0,\n        soc_pct: data.battery?.soc_pct || 0,\n        temp_c: data.battery?.temp_c || 25\n    },\n    compartment: {\n        locked: data.compartment?.locked ?? true,\n        door_closed: data.compartment?.door_closed ?? true,\n        temperature_c: data.compartment?.temperature_c || 20\n    },\n    network: {\n        rssi: data.network?.rssi || -75,\n        carrier: data.network?.carrier || '4G-LTE-Rural'\n    }\n};\n\nmsg.payload = msg.telemetry;\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 680,
+    "y": 120,
+    "wires": [
+      [
+        "debug_enriched_telemetry"
+      ]
+    ]
+  },
+  {
+    "id": "debug_telemetry_stream",
+    "type": "debug",
+    "z": "tab_tls_telemetry",
+    "name": "Raw Decrypted Telemetry",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 680,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "debug_enriched_telemetry",
+    "type": "debug",
+    "z": "tab_tls_telemetry",
+    "name": "Enriched Droid Metrics",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": true,
+    "complete": "payload.droid_id & ' | Batt: ' & payload.battery.soc_pct & '% | Lock: ' & payload.compartment.locked",
+    "targetType": "jsonata",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 950,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "inject_test_telemetry",
+    "type": "inject",
+    "z": "tab_tls_telemetry",
+    "name": "Simulate Droid Telemetry (Manual)",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "droid/droid-alpha-01/telemetry",
+    "payload": "{\"droid_id\":\"droid-alpha-01\",\"timestamp\":\"2026-10-30T14:50:00Z\",\"gps\":{\"lat\":-29.8587,\"lon\":31.0218,\"alt_m\":142.5,\"speed_kmh\":18.4},\"battery\":{\"voltage\":25.4,\"soc_pct\":88,\"temp_c\":28},\"compartment\":{\"locked\":true,\"door_closed\":true,\"temperature_c\":18.5},\"network\":{\"rssi\":-72,\"carrier\":\"4G-LTE\"}}",
+    "payloadType": "json",
+    "x": 200,
+    "y": 200,
+    "wires": [
+      [
+        "mqtt_out_test_telemetry"
+      ]
+    ]
+  },
+  {
+    "id": "mqtt_out_test_telemetry",
+    "type": "mqtt out",
+    "z": "tab_tls_telemetry",
+    "name": "Publish over TLS 8883",
+    "topic": "droid/droid-alpha-01/telemetry",
+    "qos": "1",
+    "retain": "false",
+    "respTopic": "",
+    "contentType": "application/json",
+    "userProps": "",
+    "correl": "",
+    "expiry": "",
+    "broker": "mqtt_broker_droid_tls",
+    "x": 490,
+    "y": 200,
+    "wires": []
+  }
+]
+
