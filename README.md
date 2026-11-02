@@ -189,6 +189,8 @@ ros2 launch shopdrone_simulation simulation.launch.py rviz:=true
 
 For obstacle alert testing and the optional Node-RED dashboard, see the [Node-RED guide](docs/node_red_dashboard.md).
 
+For the ShopDroid sensor mounting reference, hardware calibration procedure, and raw-feed checks, see the [sensor setup guide](docs/sensor_setup.md).
+
 ### B. Run Interactive Mission Dashboard
 To orchestrate a complete live delivery mission:
 

@@ -56,6 +56,7 @@ def generate_launch_description():
             '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry',
             '/shopdroid/lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
             '/shopdroid/camera/image_raw@sensor_msgs/msg/Image@gz.msgs.Image',
+            '/shopdroid/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo',
             '/shopdrone/lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
             '/shopdrone/camera/image_raw@sensor_msgs/msg/Image@gz.msgs.Image'
         ],
