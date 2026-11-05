@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopDrone Simulation: Blueprint & Rebuild Guide | NUST Assignment 1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(56, 189, 248, 0.3);
+      --accent-cyan: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --code-bg: #030712;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 65%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 6rem;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald), var(--accent-purple));
+    }
+
+    .badge-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.8rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .badge-cyan { background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 0.8rem;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 800px;
+    }
+
+    /* Meta Info Bar */
+    .meta-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2rem;
+    }
+
+    .meta-val {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Interactive Progress Checkpoints Tracker */
+    .progress-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .progress-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .progress-bar-container {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
+      transition: width 0.4s ease;
+    }
+
+    .checkpoint-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .checkpoint-item {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: 0.6rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .checkpoint-item:hover {
+      border-color: var(--border-hover);
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    .checkpoint-item input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      accent-color: var(--accent-emerald);
+      cursor: pointer;
+    }
+
+    .checkpoint-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* Navigation Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.8rem 1.4rem;
+      border-radius: 0.8rem 0.8rem 0 0;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-cyan);
+    }
+
+    /* Tab Content Panes */
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section Styling */
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1.2rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(12px);
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #fff;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.8rem;
+      color: var(--accent-cyan);
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    /* Code Blocks */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.8rem;
+      overflow: hidden;
+      margin: 1.2rem 0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .code-header {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.6rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .code-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: var(--text-main);
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.4rem;
+      font-family: inherit;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: background 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-cyan);
+      color: #000;
+    }
+
+    pre {
+      padding: 1.2rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Callouts / Alerts */
+    .callout {
+      padding: 1.2rem;
+      border-radius: 0.8rem;
+      margin: 1.2rem 0;
+      border-left: 4px solid;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .callout-info { border-color: var(--accent-cyan); background: rgba(56, 189, 248, 0.06); }
+    .callout-success { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.06); }
+    .callout-warning { border-color: var(--accent-amber); background: rgba(245, 158, 11, 0.06); }
+
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .callout-info .callout-title { color: var(--accent-cyan); }
+    .callout-success .callout-title { color: var(--accent-emerald); }
+    .callout-warning .callout-title { color: var(--accent-amber); }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.2rem 0;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 0.8rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    td {
+      color: var(--text-muted);
+    }
+
+    /* Interactive OTP Sandbox */
+    .otp-widget {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.7) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      max-width: 480px;
+      margin: 1.5rem auto;
+      text-align: center;
+    }
+
+    .otp-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      background: #000;
+      padding: 0.8rem;
+      border-radius: 0.6rem;
+      border: 1px solid var(--border-color);
+      color: var(--accent-cyan);
+      margin: 1rem 0;
+    }
+
+    .otp-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .otp-key {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-family: inherit;
+      font-size: 1.2rem;
+      font-weight: 600;
+      padding: 0.8rem;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .otp-key:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+    }
+
+    .otp-status-msg {
+      margin-top: 1rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      min-height: 1.5rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="badge-group">
+      <span class="badge badge-cyan">🚁 ShopDrone Simulation</span>
+      <span class="badge badge-emerald">ROS 2 Jazzy</span>
+      <span class="badge badge-amber">Gazebo Harmonic</span>
+      <span class="badge badge-cyan">NUST Assignment 1</span>
+    </div>
+    <h1>ShopDrone Simulation Architecture & Rebuild Blueprint</h1>
+    <p class="subtitle">
+      A comprehensive step-by-step master guide for reproducing, executing, and modifying the ShopDrone autonomous rural delivery simulation prototype anytime.
+    </p>
+
+    <div class="meta-bar">
+      <div class="meta-item">
+        <span class="meta-label">Operating System</span>
+        <span class="meta-val">Linux Mint 22.1 (Ubuntu 24.04 Noble)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Middleware / Simulator</span>
+        <span class="meta-val">ROS 2 Jazzy & Gazebo Harmonic</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Primary Author</span>
+        <span class="meta-val">Mphathisi Ndlovu (n02529052a@nust.ac.zw)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Department</span>
+        <span class="meta-val">NUST Computer Science</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Checkpoints Tracker -->
+  <div class="progress-card">
+    <div class="progress-header">
+      <div class="progress-title">
+        <span>⚡ Project Build Progress</span>
+      </div>
+      <span id="progress-text" style="font-weight: 700; color: var(--accent-cyan);">0% Complete</span>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+    <div class="checkpoint-grid">
+      <label class="checkpoint-item">
+        <input type="checkbox" id="chk-env" onchange="updateProgress()">
+        <span class="checkpoint-label">1. ROS 2 & Gazebo Configured</span>
+      </label>
+      <label class="checkpoint-item">
+        <input type="checkbox" id="chk-ws" onchange="updateProgress()">
+        <span class="checkpoint-label">2. ROS 2 Workspace Built</span>
+      </label>
+      <label class="checkpoint-item">
+        <input type="checkbox" id="chk-nodes" onchange="updateProgress()">
+        <span class="checkpoint-label">3. DROID Components Created</span>
+      </label>
+      <label class="checkpoint-item">
+        <input type="checkbox" id="chk-sdf" onchange="updateProgress()">
+        <span class="checkpoint-label">4. 3D Model & World Verified</span>
+      </label>
+      <label class="checkpoint-item">
+        <input type="checkbox" id="chk-test" onchange="updateProgress()">
+        <span class="checkpoint-label">5. Simulation Tested & Working</span>
+      </label>
+      <label class="checkpoint-item">
+        <input type="checkbox" id="chk-git" onchange="updateProgress()">
+        <span class="checkpoint-label">6. Pushed to NUST GitHub Repo</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('overview')">1. Overview & SRS</button>
+    <button class="tab-btn" onclick="switchTab('step1')">2. Environment Setup</button>
+    <button class="tab-btn" onclick="switchTab('step2')">3. Workspace Setup</button>
+    <button class="tab-btn" onclick="switchTab('step3')">4. DROID Components</button>
+    <button class="tab-btn" onclick="switchTab('step4')">5. Run Simulation</button>
+    <button class="tab-btn" onclick="switchTab('vibe')">6. Vibe Coding Prompts</button>
+    <button class="tab-btn" onclick="switchTab('otp')">7. Interactive OTP Demo</button>
+  </nav>
+
+  <!-- TAB 1: OVERVIEW & SRS -->
+  <div id="tab-overview" class="tab-pane active">
+    <div class="section-card">
+      <h2>🎯 Assignment Decoding: What are we doing here?</h2>
+      <p>
+        Your group created a Software Requirements Specification (SRS) for <strong>ShopDrone</strong>: an autonomous flying multi-rotor system that transports groceries and essential items to rural Zimbabwean homes (e.g. Matobo Ward 4), bypassing washed-out roads and rivers.
+      </p>
+      <p>
+        The assignment requires every individual in the project team to move beyond paper requirements by building a <strong>working 3D simulation prototype</strong> using <strong>Gazebo</strong> (the physics simulator) and <strong>ROS 2</strong> (the robotic operating system middleware), enhanced through <em>vibe coding</em> (AI pair programming).
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">💡 Traceability to Your Proposal</div>
+        <p>
+          Every piece of software in this simulation directly satisfies a section of your group's proposal:
+        </p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+          <li><strong>Section 4.6 (Drone Delivery & Flight):</strong> Autonomous flight from Hub -> Waypoint Climb -> Cruise at 15m -> Landing -> Return to Hub.</li>
+          <li><strong>Section 4.6 & 5.1 (Obstacle Detection):</strong> Forward Lidar range detection with 3-second emergency hover and collision avoidance.</li>
+          <li><strong>Section 4.8 (Safe Delivery Confirmation):</strong> Lockable cargo box requiring customer 4-digit One-Time PIN (OTP) with 3-strike tamper lockdown.</li>
+          <li><strong>Section 4.9 (Monitoring & Maintenance):</strong> Real-time GPS coordinates, battery discharge model, and low-battery (25%) automated Return-to-Hub failsafe.</li>
+        </ul>
+      </div>
+
+      <h3>Architecture Diagram</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Type</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>rural_zimbabwe.sdf</code></td>
+            <td>Gazebo World</td>
+            <td>Simulates African savannah terrain, Shop Hub base with solar panels, and customer homestead landing spot.</td>
+          </tr>
+          <tr>
+            <td><code>shopdrone (model.sdf)</code></td>
+            <td>3D Robot Model</td>
+            <td>Quadcopter chassis, spinning propellers, 25m forward Lidar sensor, and lockable cargo box payload.</td>
+          </tr>
+          <tr>
+            <td><code>flight_controller.py</code></td>
+            <td>ROS 2 Node</td>
+            <td>Autonomous state machine commanding velocity vectors on <code>/cmd_vel</code>.</td>
+          </tr>
+          <tr>
+            <td><code>cargo_lock.py</code></td>
+            <td>ROS 2 Node</td>
+            <td>Listens on <code>/shopdrone/keypad_input</code> to unlock cargo container upon OTP verification.</td>
+          </tr>
+          <tr>
+            <td><code>battery_monitor.py</code></td>
+            <td>ROS 2 Node</td>
+            <td>Calculates LiPo battery drain and initiates automated Return-to-Hub when power drops below 25%.</td>
+          </tr>
+          <tr>
+            <td><code>obstacle_monitor.py</code></td>
+            <td>ROS 2 Node</td>
+            <td>Monitors <code>/shopdrone/lidar</code> for trees or power lines within 3 meters and commands immediate hover.</td>
+          </tr>
+          <tr>
+            <td><code>telemetry_publisher.py</code></td>
+            <td>ROS 2 Node</td>
+            <td>Publishes live GPS coordinates and JSON telemetry stream for the customer and shop dashboard apps.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 2: ENVIRONMENT SETUP -->
+  <div id="tab-step1" class="tab-pane">
+    <div class="section-card">
+      <h2>🛠️ Step 1: Installing ROS 2 & Gazebo</h2>
+      <p>
+        Your computer is running <strong>Linux Mint 22.1</strong> (Xia), which uses <strong>Ubuntu 24.04 LTS (Noble Numbat)</strong> as its package base. The matching supported versions are:
+      </p>
+      <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem;">
+        <li><strong>ROS 2 Distribution:</strong> Jazzy Jalisco</li>
+        <li><strong>Gazebo Simulator:</strong> Gazebo Harmonic (<code>gz-sim</code>)</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">⚠️ Linux Mint Specific Gotcha</div>
+        <p>
+          Linux Mint's codename is <code>xia</code>, but ROS 2 APT packages are indexed under Ubuntu's codename <code>noble</code>. If you use standard Ubuntu instructions with <code>$(lsb_release -cs)</code>, it will fail. Our installer handles this automatically by setting <code>TARGET_CODENAME="noble"</code>!
+        </p>
+      </div>
+
+      <h3>Method A: Native Automated Host Installation (Recommended)</h3>
+      <p>Run the script we built directly in your project folder:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Terminal</span>
+          <button class="copy-btn" onclick="copyCode('cmd-install')">Copy</button>
+        </div>
+        <pre><code id="cmd-install">cd "/home/mphatic/Desktop/group project gazebo"
+sudo ./install_ros2_jazzy_gazebo.sh</code></pre>
+      </div>
+
+      <h3>Method B: Docker Environment (Instant Zero-Install Alternative)</h3>
+      <p>If you don't want to modify host packages, Docker is already installed and configured on your machine:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Terminal</span>
+          <button class="copy-btn" onclick="copyCode('cmd-docker')">Copy</button>
+        </div>
+        <pre><code id="cmd-docker">cd "/home/mphatic/Desktop/group project gazebo"
+./docker/run_sim_docker.sh</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: WORKSPACE SETUP -->
+  <div id="tab-step2" class="tab-pane">
+    <div class="section-card">
+      <h2>📂 Step 2: Creating and Building the ROS 2 Workspace</h2>
+      <p>
+        ROS 2 uses <strong>Colcon</strong> to build workspaces. The workspace directory is located at:
+        <code>/home/mphatic/Desktop/group project gazebo/ros2_ws</code>.
+      </p>
+
+      <h3>Build Commands</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Terminal</span>
+          <button class="copy-btn" onclick="copyCode('cmd-build')">Copy</button>
+        </div>
+        <pre><code id="cmd-build">cd "/home/mphatic/Desktop/group project gazebo/ros2_ws"
+
+# Source ROS 2 system libraries
+source /opt/ros/jazzy/setup.bash
+
+# Build the workspace
+colcon build --symlink-install
+
+# Source your workspace environment
+source install/setup.bash</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">💡 Why <code>--symlink-install</code>?</div>
+        <p>
+          The <code>--symlink-install</code> flag allows you to edit Python files (like <code>flight_controller.py</code>) and run them immediately without having to run <code>colcon build</code> every single time!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: DROID COMPONENTS -->
+  <div id="tab-step3" class="tab-pane">
+    <div class="section-card">
+      <h2>⚙️ Step 3: DROID Subsystem Components</h2>
+      <p>
+        Here is how the autonomous delivery logic is implemented across our Python nodes:
+      </p>
+
+      <h3>1. Autonomous Flight State Machine (<code>flight_controller.py</code>)</h3>
+      <p>
+        Moves through 10 distinct operational states:
+      </p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-title">State Transitions</span></div>
+        <pre><code>IDLE (At Hub) 
+  ↳ PRE_FLIGHT_CHECK (GPS locked, battery > 50%)
+    ↳ TAKEOFF (Climb vertically to 15m cruise height)
+      ↳ EN_ROUTE (Forward flight at 12 m/s toward Matobo)
+        ↳ [OBSTACLE_AVOID] (If Lidar detects obstruction < 3m)
+          ↳ LANDING (Precision descent to customer pad)
+            ↳ AWAITING_OTP (Drone landed, waiting for customer PIN)
+              ↳ DELIVERY_COMPLETE (Box unlocked, payload retrieved)
+                ↳ RETURN_TO_HUB (Climb and return flight to base)
+                  ↳ LANDED_AT_HUB (Solar dock engaged, order closed)</code></pre>
+      </div>
+
+      <h3>2. Electronic OTP Cargo Box (<code>cargo_lock.py</code>)</h3>
+      <p>
+        Implements <strong>SRS Section 4.8</strong>. The box only unlocks when the customer enters <code>4921</code> on the drone keypad. If 3 consecutive incorrect codes are entered, the system locks out and fires a security alert to the shop operator.
+      </p>
+
+      <h3>3. Battery Monitor & Failsafe (<code>battery_monitor.py</code>)</h3>
+      <p>
+        Implements <strong>SRS Section 4.6 & 4.9</strong>. Continuously measures remaining power. If battery drops to <strong>25%</strong>, it overrides manual commands and forces an autonomous Return-to-Hub (RTH).
+      </p>
+    </div>
+  </div>
+
+  <!-- TAB 5: RUN SIMULATION -->
+  <div id="tab-step4" class="tab-pane">
+    <div class="section-card">
+      <h2>🚀 Step 4: Testing & Execution Options</h2>
+      <p>You have three ways to demonstrate and verify the prototype:</p>
+
+      <h3>Option 1: Instant Standalone Prototype (No 3D GPU required)</h3>
+      <p>
+        Want to show the prototype immediately without starting heavy 3D rendering? Run our live visualizer:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Terminal</span>
+          <button class="copy-btn" onclick="copyCode('cmd-cli')">Copy</button>
+        </div>
+        <pre><code id="cmd-cli">python3 "/home/mphatic/Desktop/group project gazebo/ros2_ws/run_demo_cli.py"</code></pre>
+      </div>
+
+      <h3>Option 2: Run Full 3D Gazebo Simulation</h3>
+      <p>
+        Opens the 3D rural world, loads the drone with spinning rotors and Lidar, and executes the delivery:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Terminal</span>
+          <button class="copy-btn" onclick="copyCode('cmd-sim')">Copy</button>
+        </div>
+        <pre><code id="cmd-sim">source /opt/ros/jazzy/setup.bash
+source "/home/mphatic/Desktop/group project gazebo/ros2_ws/install/setup.bash"
+ros2 launch shopdrone_simulation simulation.launch.py</code></pre>
+      </div>
+
+      <h3>Option 3: Run Interactive Mission Dashboard</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Terminal</span>
+          <button class="copy-btn" onclick="copyCode('cmd-mission')">Copy</button>
+        </div>
+        <pre><code id="cmd-mission">source /opt/ros/jazzy/setup.bash
+source "/home/mphatic/Desktop/group project gazebo/ros2_ws/install/setup.bash"
+ros2 launch shopdrone_simulation mission_demo.launch.py</code></pre>
+      </div>
+
+      <h3>Option 4: Run Automated System Verification Tests</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Terminal</span>
+          <button class="copy-btn" onclick="copyCode('cmd-test-script')">Copy</button>
+        </div>
+        <pre><code id="cmd-test-script">python3 "/home/mphatic/Desktop/group project gazebo/ros2_ws/test_prototype.py"</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: VIBE CODING PROMPTS -->
+  <div id="tab-vibe" class="tab-pane">
+    <div class="section-card">
+      <h2>🤖 Vibe Coding Playbook for Google AI Studio & Antigravity</h2>
+      <p>
+        The assignment specifically allows you to <em>vibe code</em> with AI models. Here are the exact prompts to paste into <strong>Google AI Studio</strong> (using Gemini 1.5 Pro) or any AI coding agent if you ever want to expand features:
+      </p>
+
+      <h3>Prompt 1: Adding GPS Waypoint Navigation</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Prompt for Google AI Studio</span>
+          <button class="copy-btn" onclick="copyCode('prompt-1')">Copy</button>
+        </div>
+        <pre><code id="prompt-1">I am building a ROS 2 Jazzy and Gazebo Harmonic simulation for an autonomous delivery drone in rural Zimbabwe called 'ShopDrone'.
+Write a Python ROS 2 node 'waypoint_navigator.py' using rclpy and geometry_msgs/Twist that:
+1. Subscribes to /shopdrone/gps/fix (sensor_msgs/NavSatFix) and /odom (nav_msgs/Odometry).
+2. Computes the Haversine distance and bearing from the current GPS location to target waypoint: Latitude -20.553200, Longitude 28.514000.
+3. Publishes linear and angular velocity to /cmd_vel to steer toward the target.
+4. Triggers an arrival event when distance is under 1.5 meters.
+Include full error handling and clean comments.</code></pre>
+      </div>
+
+      <h3>Prompt 2: Adding Weather Failsafe (Wind & Rain)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Prompt for Google AI Studio</span>
+          <button class="copy-btn" onclick="copyCode('prompt-2')">Copy</button>
+        </div>
+        <pre><code id="prompt-2">In our ShopDrone SRS Section 5.2, the drone must not fly in strong winds or heavy rain.
+Write a ROS 2 Jazzy Python node 'weather_safety.py' that simulates rural weather sensor inputs.
+If simulated wind speed exceeds 30 km/h or rain sensor detects precipitation, publish an alert on /shopdrone/alerts and send a True flag to /shopdrone/failsafe_rth to abort the delivery mission.</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 7: INTERACTIVE OTP DEMO -->
+  <div id="tab-otp" class="tab-pane">
+    <div class="section-card">
+      <h2>🔐 Interactive SRS 4.8 Delivery Sandbox</h2>
+      <p style="text-align: center;">
+        Test the exact OTP cargo release logic described in <strong>Section 4.8 of the SRS</strong> right here:
+      </p>
+
+      <div class="otp-widget">
+        <div style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase;">Drone Electronic Keypad</div>
+        <div class="otp-display" id="otp-input-screen">_ _ _ _</div>
+        
+        <div class="otp-keypad">
+          <button class="otp-key" onclick="pressKey('1')">1</button>
+          <button class="otp-key" onclick="pressKey('2')">2</button>
+          <button class="otp-key" onclick="pressKey('3')">3</button>
+          <button class="otp-key" onclick="pressKey('4')">4</button>
+          <button class="otp-key" onclick="pressKey('5')">5</button>
+          <button class="otp-key" onclick="pressKey('6')">6</button>
+          <button class="otp-key" onclick="pressKey('7')">7</button>
+          <button class="otp-key" onclick="pressKey('8')">8</button>
+          <button class="otp-key" onclick="pressKey('9')">9</button>
+          <button class="otp-key" onclick="clearKey()" style="color: var(--accent-rose);">C</button>
+          <button class="otp-key" onclick="pressKey('0')">0</button>
+          <button class="otp-key" onclick="submitOTP()" style="color: var(--accent-emerald); font-size: 0.95rem;">ENTER</button>
+        </div>
+
+        <div class="otp-status-msg" id="otp-status">Enter customer OTP (Hint: 4921)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>ShopDrone Simulation Architecture • National University of Science & Technology (NUST)</p>
+    <p>Department of Computer Science • October 2026</p>
+  </footer>
+</div>
+
+<script>
+  // Tab Switching Logic
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+    event.currentTarget.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+  }
+
+  // Copy to Clipboard
+  function copyCode(elementId) {
+    const code = document.getElementById(elementId).innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = event.currentTarget;
+      const original = btn.innerText;
+      btn.innerText = 'Copied! ✔';
+      btn.style.background = '#10b981';
+      btn.style.color = '#fff';
+      setTimeout(() => {
+        btn.innerText = original;
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 2000);
+    });
+  }
+
+  // Checkpoints Progress Calculation
+  function updateProgress() {
+    const checkboxes = document.querySelectorAll('.checkpoint-item input[type="checkbox"]');
+    let checkedCount = 0;
+    checkboxes.forEach(cb => {
+      if (cb.checked) checkedCount++;
+      localStorage.setItem(cb.id, cb.checked ? '1' : '0');
+    });
+
+    const percent = Math.round((checkedCount / checkboxes.length) * 100);
+    document.getElementById('progress-bar').style.width = percent + '%';
+    document.getElementById('progress-text').innerText = percent + '% Complete';
+  }
+
+  // Restore saved checkbox states
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.checkpoint-item input[type="checkbox"]').forEach(cb => {
+      if (localStorage.getItem(cb.id) === '1') {
+        cb.checked = true;
+      }
+    });
+    updateProgress();
+  });
+
+  // Interactive OTP Simulation Logic
+  let currentDigits = "";
+  const EXPECTED = "4921";
+  let failedCount = 0;
+  let lockedDown = false;
+
+  function pressKey(d) {
+    if (lockedDown) return;
+    if (currentDigits.length < 4) {
+      currentDigits += d;
+      updateOTPScreen();
+    }
+  }
+
+  function clearKey() {
+    if (lockedDown) return;
+    currentDigits = "";
+    updateOTPScreen();
+    document.getElementById('otp-status').innerText = "Enter customer OTP (Hint: 4921)";
+    document.getElementById('otp-status').style.color = "var(--text-muted)";
+  }
+
+  function updateOTPScreen() {
+    let displayStr = currentDigits;
+    while (displayStr.length < 4) {
+      displayStr += "_";
+    }
+    document.getElementById('otp-input-screen').innerText = displayStr.split('').join(' ');
+  }
+
+  function submitOTP() {
+    if (lockedDown) return;
+    const statusEl = document.getElementById('otp-status');
+
+    if (currentDigits === EXPECTED) {
+      statusEl.innerText = "✔ UNLOCKED! Cargo lid opened. Goods accessible. (SRS 4.8)";
+      statusEl.style.color = "var(--accent-emerald)";
+      failedCount = 0;
+    } else {
+      failedCount++;
+      if (failedCount >= 3) {
+        lockedDown = true;
+        statusEl.innerText = "🚨 TAMPER LOCKOUT! 3 wrong attempts. Shop notified.";
+        statusEl.style.color = "var(--accent-rose)";
+      } else {
+        statusEl.innerText = `❌ Incorrect OTP! Attempt ${failedCount}/3.`;
+        statusEl.style.color = "var(--accent-amber)";
+      }
+    }
+    currentDigits = "";
+    setTimeout(updateOTPScreen, 1000);
+  }
+</script>
+
+</body>
+</html>

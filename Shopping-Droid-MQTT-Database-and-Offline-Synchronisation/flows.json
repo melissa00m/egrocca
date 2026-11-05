@@ -1,0 +1,771 @@
+[
+    {
+        "id": "45b16974b32c6295",
+        "type": "tab",
+        "label": "telementary storage flow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "8f517b7e76244d29",
+        "type": "tab",
+        "label": "offline queue",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "8ecb6cf9e2e65492",
+        "type": "tab",
+        "label": "retry fkow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "a2e88791afafdc3e",
+        "type": "tab",
+        "label": "http request flow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "b49a34ab988a9508",
+        "type": "tab",
+        "label": "Shopping Droid Management.",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1a44dfa494ee4590",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "\t127.0.0.1",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ba677db152f88286",
+        "type": "sqlitedb",
+        "db": "/home/isaac/shopping_droid/data/droid.db",
+        "mode": "RWC"
+    },
+    {
+        "id": "b6fdf051bbc7cf6c",
+        "type": "mqtt in",
+        "z": "45b16974b32c6295",
+        "name": "",
+        "topic": "droid/sensor",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "1a44dfa494ee4590",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 360,
+        "wires": [
+            [
+                "bab8e3fb27486c69"
+            ]
+        ]
+    },
+    {
+        "id": "bab8e3fb27486c69",
+        "type": "json",
+        "z": "45b16974b32c6295",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 330,
+        "y": 200,
+        "wires": [
+            [
+                "61663d905eb89e7e"
+            ]
+        ]
+    },
+    {
+        "id": "61663d905eb89e7e",
+        "type": "function",
+        "z": "45b16974b32c6295",
+        "name": "Prepare Telementry SQL",
+        "func": "\nconst data = msg.payload;\n\n// Convert the sensor message to JSON text\nconst sensorData = JSON.stringify(data);\n\n// Escape single quotes for SQL\nconst safeData = sensorData.replace(/'/g, \"''\");\n\n// Build the SQL statement\nmsg.topic = \"INSERT INTO telemetry (topic, payload, synced) VALUES ('droid/sensor', '\" +\n    safeData +\n    \"', 0)\";\n\n// Remove the old payload so the SQLite node doesn't use stale parameters\ndelete msg.payload;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 280,
+        "wires": [
+            [
+                "d73ad29268b1caa6"
+            ]
+        ]
+    },
+    {
+        "id": "d73ad29268b1caa6",
+        "type": "sqlite",
+        "z": "45b16974b32c6295",
+        "mydb": "ba677db152f88286",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "save sensor telemetry",
+        "x": 780,
+        "y": 400,
+        "wires": [
+            [
+                "6bf7b8862fdf2e64"
+            ]
+        ]
+    },
+    {
+        "id": "6bf7b8862fdf2e64",
+        "type": "debug",
+        "z": "45b16974b32c6295",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "e81e3441b27019d8",
+        "type": "mqtt in",
+        "z": "8f517b7e76244d29",
+        "name": "",
+        "topic": "droid/sensor",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "1a44dfa494ee4590",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 300,
+        "wires": [
+            [
+                "b18672cb20b1f762"
+            ]
+        ]
+    },
+    {
+        "id": "b18672cb20b1f762",
+        "type": "function",
+        "z": "8f517b7e76244d29",
+        "name": "offline sql",
+        "func": "\nconst originalTopic = msg.topic;\nconst data = msg.payload;\n\nconst safeTopic = String(originalTopic).replace(/'/g, \"''\");\nconst safePayload = JSON.stringify(data).replace(/'/g, \"''\");\n\nmsg.topic = `\n    INSERT INTO offline_queue\n        (topic, payload, retry_count, synced)\n    VALUES\n        ('${safeTopic}', '${safePayload}', 0, 0)\n`;\n\ndelete msg.payload;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 200,
+        "wires": [
+            [
+                "3717ee9a3d74b2f7"
+            ]
+        ]
+    },
+    {
+        "id": "3717ee9a3d74b2f7",
+        "type": "sqlite",
+        "z": "8f517b7e76244d29",
+        "mydb": "ba677db152f88286",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "save offline msg",
+        "x": 540,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "05b75d011e373130",
+        "type": "inject",
+        "z": "8ecb6cf9e2e65492",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "30",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "2ee52d526332b4b9"
+            ]
+        ]
+    },
+    {
+        "id": "2ee52d526332b4b9",
+        "type": "function",
+        "z": "8ecb6cf9e2e65492",
+        "name": "get pending msg",
+        "func": "msg.topic = `\n    SELECT queue_id, topic, payload, retry_count\n    FROM offline_queue\n    WHERE synced = 0\n    ORDER BY queue_id ASC\n    LIMIT 20\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 220,
+        "wires": [
+            [
+                "d048bf72d82e592a"
+            ]
+        ]
+    },
+    {
+        "id": "d048bf72d82e592a",
+        "type": "sqlite",
+        "z": "8ecb6cf9e2e65492",
+        "mydb": "ba677db152f88286",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "retry",
+        "x": 470,
+        "y": 380,
+        "wires": [
+            [
+                "f3d385441a1af4c3"
+            ]
+        ]
+    },
+    {
+        "id": "f3d385441a1af4c3",
+        "type": "split",
+        "z": "8ecb6cf9e2e65492",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 290,
+        "y": 440,
+        "wires": [
+            [
+                "1defa190320816d8"
+            ]
+        ]
+    },
+    {
+        "id": "f2f55eaae3208d80",
+        "type": "http request",
+        "z": "8ecb6cf9e2e65492",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://localhost:1880/shopping-droid/sync-test",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 290,
+        "y": 580,
+        "wires": [
+            [
+                "0acb8381495c71d0"
+            ]
+        ]
+    },
+    {
+        "id": "01270ea23d8c54e9",
+        "type": "debug",
+        "z": "8ecb6cf9e2e65492",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "1defa190320816d8",
+        "type": "function",
+        "z": "8ecb6cf9e2e65492",
+        "name": "prepare msg",
+        "func": "const queueId = Number(msg._queueId);\n\nif (!Number.isInteger(queueId) || queueId < 1) {\n    node.error(\"Missing or invalid queue ID\", msg);\n    return null;\n}\n\nif (msg.statusCode === 200 &&\n    msg.payload &&\n    msg.payload.success === true) {\n\n    msg.topic =\n        \"UPDATE offline_queue SET synced = 1 WHERE queue_id = \" +\n        queueId;\n\n} else {\n\n    msg.topic =\n        \"UPDATE offline_queue SET retry_count = retry_count + 1 WHERE queue_id = \" +\n        queueId;\n}\n\ndelete msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 90,
+        "y": 480,
+        "wires": [
+            [
+                "f2f55eaae3208d80"
+            ]
+        ]
+    },
+    {
+        "id": "0acb8381495c71d0",
+        "type": "function",
+        "z": "8ecb6cf9e2e65492",
+        "name": "check recever rq",
+        "func": "const queueId = Number(msg._queueId);\n\nif (!Number.isInteger(queueId) || queueId < 1) {\n    node.error(\"Missing or invalid queue ID\", msg);\n    return null;\n}\n\nif (msg.statusCode === 200 &&\n    msg.payload &&\n    msg.payload.success === true) {\n\n    msg.topic =\n        \"UPDATE offline_queue SET synced = 1 WHERE queue_id = \" +\n        queueId;\n\n} else {\n\n    msg.topic =\n        \"UPDATE offline_queue SET retry_count = retry_count + 1 WHERE queue_id = \" +\n        queueId;\n}\n\ndelete msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 700,
+        "wires": [
+            [
+                "4515604b82c6287a"
+            ]
+        ]
+    },
+    {
+        "id": "4515604b82c6287a",
+        "type": "sqlite",
+        "z": "8ecb6cf9e2e65492",
+        "mydb": "ba677db152f88286",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "updated Queue",
+        "x": 440,
+        "y": 800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "75f169d9cfa423e3",
+        "type": "http in",
+        "z": "a2e88791afafdc3e",
+        "name": "",
+        "url": "/shopping-droid/sync-test",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 360,
+        "wires": [
+            [
+                "7cda9ff1f2d6b29b"
+            ]
+        ]
+    },
+    {
+        "id": "7cda9ff1f2d6b29b",
+        "type": "json",
+        "z": "a2e88791afafdc3e",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 350,
+        "y": 280,
+        "wires": [
+            [
+                "a43cfe6810fbee7b"
+            ]
+        ]
+    },
+    {
+        "id": "a43cfe6810fbee7b",
+        "type": "function",
+        "z": "a2e88791afafdc3e",
+        "name": "test receiver",
+        "func": "msg.statusCode = 200;\n\nmsg.payload = {\n    success: true,\n    message: \"Test receiver accepted the message\",\n    received: msg.payload\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 400,
+        "wires": [
+            [
+                "b8d968e6075aae67"
+            ]
+        ]
+    },
+    {
+        "id": "b8d968e6075aae67",
+        "type": "http response",
+        "z": "a2e88791afafdc3e",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 550,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "69313a37add6795d",
+        "type": "inject",
+        "z": "b49a34ab988a9508",
+        "name": "add suplier products",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "1c8edd3b9716095e"
+            ]
+        ]
+    },
+    {
+        "id": "1c8edd3b9716095e",
+        "type": "function",
+        "z": "b49a34ab988a9508",
+        "name": "prepare inventry sql",
+        "func": "const product = {\n    supplier_id: 1,\n    product_name: \"Bread\",\n    quantity: 20,\n    unit_price: 1.50\n};\n\nmsg.topic = `\nINSERT INTO inventory\n(supplier_id, product_name, quantity, unit_price)\nVALUES\n(${product.supplier_id}, '${product.product_name}',\n${product.quantity}, ${product.unit_price})\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 220,
+        "wires": [
+            [
+                "0a404b5c2629dcd1"
+            ]
+        ]
+    },
+    {
+        "id": "0a404b5c2629dcd1",
+        "type": "sqlite",
+        "z": "b49a34ab988a9508",
+        "mydb": "ba677db152f88286",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "",
+        "x": 580,
+        "y": 340,
+        "wires": [
+            [
+                "21236ce7991c7225"
+            ]
+        ]
+    },
+    {
+        "id": "21236ce7991c7225",
+        "type": "debug",
+        "z": "b49a34ab988a9508",
+        "name": "inventry results",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "e5db514ff6c221c3",
+        "type": "inject",
+        "z": "b49a34ab988a9508",
+        "name": "place customer order",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 560,
+        "wires": [
+            [
+                "ded54d82757bbad1"
+            ]
+        ]
+    },
+    {
+        "id": "ded54d82757bbad1",
+        "type": "function",
+        "z": "b49a34ab988a9508",
+        "name": "customer order",
+        "func": "const order = {\n    customer_id: 1,\n    product_id: 1,\n    quantity: 2\n};\n\nmsg.topic = `\nSELECT product_id, product_name, quantity, unit_price\nFROM inventory\nWHERE product_id = ${order.product_id}\n`;\n\nmsg.order = order;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 640,
+        "wires": [
+            [
+                "942fbd1f2d26d6b3"
+            ]
+        ]
+    },
+    {
+        "id": "942fbd1f2d26d6b3",
+        "type": "function",
+        "z": "b49a34ab988a9508",
+        "name": "product availability",
+        "func": "const product = msg.payload[0];\nconst order = msg.order;\n\nif (!product) {\n    msg.payload = \"Product not found\";\n    return [null, msg];\n}\n\nif (product.quantity < order.quantity) {\n    msg.payload = \"Not enough stock available\";\n    return [null, msg];\n}\n\nmsg.order.total_amount = product.unit_price * order.quantity;\nmsg.order.unit_price = product.unit_price;\n\nmsg.payload = msg.order;\n\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 740,
+        "wires": [
+            [
+                "e0c4d295fd375509"
+            ],
+            [
+                "e3d9a221b04401a9"
+            ]
+        ]
+    },
+    {
+        "id": "e3d9a221b04401a9",
+        "type": "function",
+        "z": "b49a34ab988a9508",
+        "name": "save customer order",
+        "func": "const order = msg.order;\n\nmsg.topic = `\nINSERT INTO orders\n(customer_id, total_amount, payment_status, order_status)\nVALUES\n(${order.customer_id}, ${order.total_amount}, 'unpaid', 'pending')\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 840,
+        "wires": [
+            [
+                "a2c2e1d157d66c93"
+            ]
+        ]
+    },
+    {
+        "id": "a2c2e1d157d66c93",
+        "type": "sqlite",
+        "z": "b49a34ab988a9508",
+        "mydb": "ba677db152f88286",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "save order",
+        "x": 770,
+        "y": 960,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "05779fd4081dec4d",
+        "type": "function",
+        "z": "b49a34ab988a9508",
+        "name": "prepare order",
+        "func": "const orderId = msg.payload.lastID;\nconst order = msg.order;\n\nif (!orderId) {\n    node.error(\"Order ID was not returned by SQLite\", msg);\n    return null;\n}\n\nmsg.topic = `\nINSERT INTO order_items\n(order_id, product_id, quantity, unit_price)\nVALUES\n(${orderId}, ${order.product_id}, ${order.quantity}, ${order.unit_price})\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 1080,
+        "wires": [
+            [
+                "561805bbffe378a3"
+            ]
+        ]
+    },
+    {
+        "id": "561805bbffe378a3",
+        "type": "sqlite",
+        "z": "b49a34ab988a9508",
+        "mydb": "ba677db152f88286",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "save order iterms",
+        "x": 850,
+        "y": 1140,
+        "wires": [
+            [
+                "e37d7381bffd026f"
+            ]
+        ]
+    },
+    {
+        "id": "e37d7381bffd026f",
+        "type": "function",
+        "z": "b49a34ab988a9508",
+        "name": "updated inventry stock",
+        "func": "const order = msg.order;\n\nmsg.topic = `\nUPDATE inventory\nSET quantity = quantity - ${order.quantity},\n    updated_at = CURRENT_TIMESTAMP\nWHERE product_id = ${order.product_id}\nAND quantity >= ${order.quantity}\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 1180,
+        "wires": [
+            [
+                "513940fc7d4435f2"
+            ]
+        ]
+    },
+    {
+        "id": "513940fc7d4435f2",
+        "type": "sqlite",
+        "z": "b49a34ab988a9508",
+        "mydb": "ba677db152f88286",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "updated inventry stock",
+        "x": 1180,
+        "y": 1260,
+        "wires": [
+            [
+                "6ea56ae48d7bf04e"
+            ]
+        ]
+    },
+    {
+        "id": "6ea56ae48d7bf04e",
+        "type": "debug",
+        "z": "b49a34ab988a9508",
+        "name": "updated stock in inventry",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1370,
+        "y": 1360,
+        "wires": []
+    },
+    {
+        "id": "e0c4d295fd375509",
+        "type": "debug",
+        "z": "b49a34ab988a9508",
+        "name": "order rejected",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "4a3b610e35e97376",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-sqlite": "2.0.1"
+        }
+    }
+]
